@@ -51,7 +51,7 @@ export default function Button({
       disabled={disabled}
       {...props}
     >
-      {icon && <span className="mr-2">{icon}</span>}
+      {icon && <span className="ml-2">{icon}</span>}
       {children}
     </button>
   );

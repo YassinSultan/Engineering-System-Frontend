@@ -8,6 +8,8 @@ import store from "./app/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
+import AddCompany from "./components/pages/Company/AddCompany";
+import Company from "./components/pages/Company/Company";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +19,14 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "company",
+        element: <Company />,
+      },
+      {
+        path: "company/new",
+        element: <AddCompany />,
       },
       {
         path: "*",
