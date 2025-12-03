@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Cairo";
+  src: url("./assets/fonts/Cairo-VariableFont_slnt\,wght.ttf")
+}
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* light mode */
+@theme {
+  --color-background: oklch(100% 0 0);
+  --color-foreground: oklch(0% 0 0);
+  --color-primary-50: oklch(96.49% 0.015 222.68);
+  --color-primary-100: oklch(92.88% 0.029 227.01);
+  --color-primary-200: oklch(85.87% 0.060 228.33);
+  --color-primary-300: oklch(79.11% 0.087 229.29);
+  --color-primary-400: oklch(72.68% 0.112 231.19);
+  --color-primary-500: oklch(66.77% 0.131 235);
+  --color-primary-600: oklch(56.72% 0.109 234.43);
+  --color-primary-700: oklch(46.24% 0.088 234.14);
+  --color-primary-800: oklch(35.14% 0.064 233.65);
+  --color-primary-900: oklch(23.06% 0.036 231.06);
+  --color-primary-950: oklch(18.96% 0.029 229.99);
+  --color-primary-content-50: oklch(0% 0 0);
+  --color-primary-content-100: oklch(0% 0 0);
+  --color-primary-content-200: oklch(0% 0 0);
+  --color-primary-content-300: oklch(0% 0 0);
+  --color-primary-content-400: oklch(100% 0 0);
+  --color-primary-content-500: oklch(100% 0 0);
+  --color-primary-content-600: oklch(100% 0 0);
+  --color-primary-content-700: oklch(100% 0 0);
+  --color-primary-content-800: oklch(100% 0 0);
+  --color-primary-content-900: oklch(100% 0 0);
+  --color-primary-content-950: oklch(100% 0 0);
+}
+
+/* dark mode */
+@layer theme {
+  .dark {
+    --color-background: oklab(21.779% 0 -0.00002);
+    --color-foreground: oklch(100% 0 0);
+    --color-primary-50: oklch(96.49% 0.015 222.68);
+    --color-primary-100: oklch(92.88% 0.029 227.01);
+    --color-primary-200: oklch(85.87% 0.060 228.33);
+    --color-primary-300: oklch(79.11% 0.087 229.29);
+    --color-primary-400: oklch(72.68% 0.112 231.19);
+    --color-primary-500: oklch(66.77% 0.131 235);
+    --color-primary-600: oklch(56.72% 0.109 234.43);
+    --color-primary-700: oklch(46.24% 0.088 234.14);
+    --color-primary-800: oklch(35.14% 0.064 233.65);
+    --color-primary-900: oklch(23.06% 0.036 231.06);
+  }
+}
+
+body {
+  font-family: "Cairo", sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
