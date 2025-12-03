@@ -43,7 +43,7 @@ export default function SearchInput({
         {/* اختيار نوع البحث */}
         <select
           name="search-selector"
-          className="px-3 py-2 rounded-s-lg bg-primary-500 text-primary-content-500 w-1/3 "
+          className="px-3 py-2 rounded-s-lg bg-primary-500 text-primary-content-500 w-fit"
           onChange={(e) => onSearchFieldChange(e.target.value)}
         >
           <option
@@ -58,7 +58,7 @@ export default function SearchInput({
             <option
               key={f.value}
               value={f.value}
-              className="bg-primary-500 text-primary-content-500"
+              className="bg-primary-500 text-primary-content-500 z-40"
             >
               {f.label}
             </option>
