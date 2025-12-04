@@ -71,7 +71,7 @@ export default function DataTable({
   return (
     <div className="table-container bg-card">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm text-nowrap">
           <thead className="bg-table-header text-table-header-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -80,7 +80,7 @@ export default function DataTable({
                     header.column.columnDef.enableSorting !== false;
                   return (
                     <th
-                      key={header.id}
+                      key={`${header.column.id}-${header.depth}`}
                       className={cn(
                         "px-4 py-3.5 font-semibold text-center whitespace-nowrap transition-colors bg-primary-500 text-primary-content-500",
                         canSort && "cursor-pointer hover:bg-primary-500/80"
@@ -150,7 +150,7 @@ export default function DataTable({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
-                      key={cell.id}
+                      key={`${row.id}-${cell.id}`}
                       className="px-4 py-3 text-center border-x last:border-l-0 first:border-s-0 "
                     >
                       {flexRender(

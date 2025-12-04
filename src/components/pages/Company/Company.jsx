@@ -9,6 +9,7 @@ import { BsEye, BsFileText, BsTrash2 } from "react-icons/bs";
 import { BiEdit, BiFolder } from "react-icons/bi";
 import { NavLink } from "react-router";
 import DataTable from "../../common/DataTabel/DataTable";
+import { FiRefreshCcw } from "react-icons/fi";
 const fields = [
   {
     value: "companyCode",
@@ -25,10 +26,6 @@ const fields = [
   {
     value: "securityApprovalNumber",
     label: " رقم الموافقة الامنية",
-  },
-  {
-    value: "companyCategory",
-    label: "فئة الشركة",
   },
   {
     value: "companyBrand",
@@ -67,7 +64,11 @@ export default function Company() {
   const [globalFilter, setGlobalFilter] = useState(""); //real filter after user click button or select suggestion
   const [sorting, setSorting] = useState([]);
 
-  const { data: res, isLoading } = useQuery({
+  const {
+    data: res,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["companies", pageIndex, pageSize, globalFilter, sorting],
     queryFn: () =>
       getCompanies({
@@ -97,6 +98,55 @@ export default function Company() {
       ),
     },
     {
+      id: "commercialRegister",
+      header: "رقم السجل",
+      accessorKey: "commercialRegister",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+          {row.original.commercialRegister}
+        </span>
+      ),
+    },
+    {
+      id: "securityApprovalNumber",
+      header: "رقم الموافقة الامنية",
+      accessorKey: "securityApprovalNumber",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+          {row.original.securityApprovalNumber}
+        </span>
+      ),
+    },
+    {
+      id: "securityApprovalDate",
+      header: "تاريخ الموافقة الامنية",
+      accessorKey: "securityApprovalDate",
+      cell: ({ row }) => {
+        const date = new Date(row.original.securityApprovalDate);
+        const formatted = new Intl.DateTimeFormat("EG", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }).format(date);
+
+        return (
+          <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+            {formatted}
+          </span>
+        );
+      },
+    },
+    {
+      id: "fiscalYear",
+      header: "العام المالي",
+      accessorKey: "fiscalYear",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+          {row.original.fiscalYear}
+        </span>
+      ),
+    },
+    {
       id: "companyName",
       header: "اسم الشركة",
       accessorKey: "companyName",
@@ -107,29 +157,55 @@ export default function Company() {
       ),
     },
     {
-      id: "commercialRegister",
-      header: "رقم السجل",
-      accessorKey: "commercialRegister",
-    },
-    {
       id: "companyCategory",
       header: "فئة الشركة",
       accessorKey: "companyCategory",
       cell: ({ row }) => (
-        <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-accent text-accent-foreground">
+        <span className="font-mono text-primary">
           {row.original.companyCategory}
         </span>
       ),
     },
+    {
+      id: "companyBrand",
+      header: "السمة التجارية للشركة",
+      accessorKey: "companyBrand",
+      cell: ({ row }) => (
+        <span className="font-mono text-primary">
+          {row.original.companyBrand}
+        </span>
+      ),
+    },
+    {
+      id: "companyActivity",
+      header: "نشاط الشركة",
+      accessorKey: "companyActivity",
+      cell: ({ row }) => (
+        <span className="font-mono text-primary">
+          {row.original.companyActivity}
+        </span>
+      ),
+    },
+
     {
       id: "ownerName",
       header: "مالك الشركة",
       accessorKey: "ownerName",
     },
     {
-      id: "legalForm",
-      header: "الشكل القانوني",
-      accessorKey: "legalForm",
+      id: "ownerNID",
+      header: "رقم هوية مالك الشركة",
+      accessorKey: "ownerNID",
+    },
+    {
+      id: "representativeName",
+      header: "مندوب الشركة",
+      accessorKey: "representativeName",
+    },
+    {
+      id: "address",
+      header: "عنوان الشركة",
+      accessorKey: "address",
     },
     {
       id: "phones",
@@ -141,6 +217,26 @@ export default function Company() {
           {row.original.phones?.join(" | ") || "-"}
         </span>
       ),
+    },
+    {
+      id: "fax",
+      header: "فاكس الشركة",
+      accessorKey: "fax",
+    },
+    {
+      id: "email",
+      header: "البريد الكتروني للشركة",
+      accessorKey: "email",
+    },
+    {
+      id: "legalForm",
+      header: "الشكل القانوني",
+      accessorKey: "legalForm",
+    },
+    {
+      id: "securityFileNumber",
+      header: "رقم الملف بمكتب الامن",
+      accessorKey: "securityFileNumber",
     },
     {
       id: "files",
@@ -220,18 +316,24 @@ export default function Company() {
           <Button icon={<FaPlus />}>اضافة شركة</Button>
         </div>
       </div>
-      <div className="w-1/2">
-        <SearchInput
-          fields={fields}
-          suggestions={suggestions}
-          selectedField={searchField}
-          onChangeText={setSearchString}
-          onSelectSuggestion={(value) => setGlobalFilter(value)}
-          onSearchFieldChange={(value) => {
-            setSearchField(value);
-            setSearchString("");
-          }}
-        />
+      <div className="flex items-center justify-between">
+        <div className="w-1/2">
+          <SearchInput
+            fields={fields}
+            suggestions={suggestions}
+            selectedField={searchField}
+            onChangeText={setSearchString}
+            onSelectSuggestion={(value) => setGlobalFilter(value)}
+            onSearchFieldChange={(value) => {
+              setSearchField(value);
+              setSearchString("");
+            }}
+          />
+        </div>
+        {/* refresh button */}
+        <Button onClick={() => refetch()}>
+          <FiRefreshCcw />
+        </Button>
       </div>
       {/* Table */}
       <div>

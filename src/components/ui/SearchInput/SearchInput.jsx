@@ -44,10 +44,10 @@ export default function SearchInput({
         <select
           name="search-selector"
           className="px-3 py-2 rounded-s-lg bg-primary-500 text-primary-content-500 w-fit"
+          defaultValue="all"
           onChange={(e) => onSearchFieldChange(e.target.value)}
         >
           <option
-            selected
             value="all"
             className="bg-primary-500 text-primary-content-500"
           >
