@@ -156,8 +156,9 @@ export default function Sidebar() {
   return (
     <div
       className={`
-    h-screen bg-base-200 transition-all duration-300 overflow-hidden text-nowrap
-    ${isOpen ? "w-56" : "w-12"}
+       
+    h-screen transition-all duration-300 overflow-hidden text-nowrap bg-base border-l px-2 border-background
+    ${isOpen ? "w-56" : "w-17"}
   `}
     >
       <div className="flex flex-col h-full overflow-y-auto py-6 px-0 space-y-1">
@@ -168,7 +169,7 @@ export default function Sidebar() {
                 {/* Dropdown Header */}
                 <button
                   onClick={() => toggleDropdown(index)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg  transition-all duration-200 group cursor-pointer"
+                  className="w-full flex items-center justify-between px-4 py-3 font-medium rounded-lg  transition-all duration-200 group cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-primary">{item.icon}</span>
@@ -216,7 +217,7 @@ export default function Sidebar() {
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
+                  `flex items-center gap-3 px-4 py-3 font-medium rounded-lg transition-all duration-200 ${
                     isActive
                       ? "bg-primary-200 text-primary-content-200 font-medium shadow-md"
                       : "hover:bg-primary-100 hover:text-primary-content-100"

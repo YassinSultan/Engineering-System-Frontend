@@ -8,7 +8,7 @@ export default function Navbar() {
   const dispatch = useDispatch();
   return (
     <>
-      <div className="w-full flex justify-between items-center px-5 py-4">
+      <div className="w-full flex justify-between items-center px-5 py-4 bg-base">
         {/* logo */}
         <BsLayoutSidebarReverse
           className="cursor-pointer"
