@@ -155,9 +155,10 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`static inset-y-0 right-0 z-50 w-64 bg-base-200 transition-all duration-300 ease-in-out overflow-hidden
-        ${isOpen ? "static" : "hidden"}
-        lg:translate-x-0 lg:static lg:inset-auto overflow-auto h-screen`}
+      className={`
+    h-screen bg-base-200 transition-all duration-300 overflow-hidden text-nowrap
+    ${isOpen ? "w-56" : "w-12"}
+  `}
     >
       <div className="flex flex-col h-full overflow-y-auto py-6 px-0 space-y-1">
         {menu.map((item, index) => (
@@ -171,40 +172,44 @@ export default function Sidebar() {
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-primary">{item.icon}</span>
-                    <span className="text-right">{item.label}</span>
+                    {isOpen && <span>{item.label}</span>}
                   </div>
-                  <IoIosArrowDown
-                    className={`size-5 transition-transform duration-300 ${
-                      isDropdownOpen(index) ? "-rotate-180" : ""
-                    }`}
-                  />
+                  {isOpen && (
+                    <IoIosArrowDown
+                      className={`size-5 transition-transform duration-300 ${
+                        isDropdownOpen(index) ? "-rotate-180" : ""
+                      }`}
+                    />
+                  )}
                 </button>
 
                 {/* Dropdown Items */}
-                <ul
-                  className={`mr-6 space-y-1 transition-all duration-300 ease-in-out overflow-hidden ${
-                    isDropdownOpen(index)
-                      ? "max-h-96 opacity-100"
-                      : "max-h-0 opacity-0"
-                  } border-s-2 ps-2`}
-                >
-                  {item.subMenu.map((subItem, subIndex) => (
-                    <li key={subIndex}>
-                      <NavLink
-                        to={`${item.path}${subItem.path}`}
-                        className={({ isActive }) =>
-                          `block px-4 py-2.5 text-sm rounded-md transition-colors ${
-                            isActive
-                              ? "bg-primary-200 text-primary-content-200 font-medium"
-                              : "hover:bg-primary-100 hover:text-primary-content-100"
-                          }`
-                        }
-                      >
-                        {subItem.label}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
+                {isOpen && isDropdownOpen(index) && (
+                  <ul
+                    className={`mr-6 space-y-1 transition-all duration-300 ease-in-out overflow-hidden ${
+                      isDropdownOpen(index)
+                        ? "max-h-96 opacity-100"
+                        : "max-h-0 opacity-0"
+                    } border-s-2 ps-2`}
+                  >
+                    {item.subMenu.map((subItem, subIndex) => (
+                      <li key={subIndex}>
+                        <NavLink
+                          to={`${item.path}${subItem.path}`}
+                          className={({ isActive }) =>
+                            `block px-4 py-2.5 text-sm rounded-md transition-colors ${
+                              isActive
+                                ? "bg-primary-200 text-primary-content-200 font-medium"
+                                : "hover:bg-primary-100 hover:text-primary-content-100"
+                            }`
+                          }
+                        >
+                          {subItem.label}
+                        </NavLink>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             ) : (
               /* Regular Menu Item */
@@ -219,7 +224,7 @@ export default function Sidebar() {
                 }
               >
                 <span className="text-primary">{item.icon}</span>
-                <span>{item.label}</span>
+                {isOpen && <span>{item.label}</span>}
               </NavLink>
             )}
           </div>

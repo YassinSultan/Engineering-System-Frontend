@@ -70,8 +70,8 @@ export default function DataTable({
 
   return (
     <div className="table-container bg-card">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-nowrap">
+      <div className="w-full overflow-auto rounded-md border border-table-border">
+        <table className="w-full min-w-max text-sm text-nowrap">
           <thead className="bg-table-header text-table-header-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
