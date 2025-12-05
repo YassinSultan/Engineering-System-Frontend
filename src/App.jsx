@@ -10,6 +10,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
 import AddCompany from "./components/pages/Company/AddCompany";
 import Company from "./components/pages/Company/Company";
+import UpdateCompany from "./components/pages/Company/UpdateCompany";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "company/new",
         element: <AddCompany />,
+      },
+      {
+        path: "company/edit/:id",
+        element: <UpdateCompany />,
       },
       {
         path: "*",

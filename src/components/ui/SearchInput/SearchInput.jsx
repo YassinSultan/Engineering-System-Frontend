@@ -83,7 +83,7 @@ export default function SearchInput({
           {showSuggestions &&
             selectedField !== "all" &&
             suggestions?.data?.length > 0 && (
-              <ul className="absolute left-0 right-0 border mt-1 rounded-md shadow-md max-h-40 overflow-auto z-10">
+              <ul className="absolute left-0 right-0 border mt-1 rounded-md shadow-md max-h-40 overflow-auto z-10 bg-background">
                 {suggestions.data.map((item, idx) => (
                   <li
                     key={idx}

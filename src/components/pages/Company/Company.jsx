@@ -2,14 +2,20 @@ import React, { useMemo, useState } from "react";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Button from "../../ui/Button/Button";
 import { FaDownload, FaPlus } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
-import { getCompanies, suggestionFilter } from "../../../api/companyAPI";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  deleteCompany,
+  getCompanies,
+  suggestionFilter,
+} from "../../../api/companyAPI";
 import SearchInput from "../../ui/SearchInput/SearchInput";
 import { BsEye, BsFileText, BsTrash2 } from "react-icons/bs";
 import { BiEdit, BiFolder } from "react-icons/bi";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import DataTable from "../../common/DataTabel/DataTable";
 import { FiRefreshCcw } from "react-icons/fi";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 const fields = [
   {
     value: "companyCode",
@@ -63,7 +69,7 @@ export default function Company() {
   const [searchString, setSearchString] = useState(""); //filter Search
   const [globalFilter, setGlobalFilter] = useState(""); //real filter after user click button or select suggestion
   const [sorting, setSorting] = useState([]);
-
+  const navigate = useNavigate();
   const {
     data: res,
     isLoading,
@@ -84,6 +90,35 @@ export default function Company() {
     queryFn: () => suggestionFilter(searchField, { search: searchString }),
     enabled: searchString.length > 1, // مشتغلش إلا لما يكتب كفاية
   });
+  // Delete Mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteCompany,
+    onSuccess: () => {
+      toast.success("تم حذف الشركة بنجاح");
+      refetch();
+    },
+    onError: (error) => {
+      console.log(
+        "فشل حذف الشركة: " + (error.response?.data?.message || error.message)
+      );
+      toast.error("فشل حذف الشركة");
+    },
+  });
+  const handelDelete = (id) => {
+    Swal.fire({
+      title: "هل انت متاكد من حذف الشركة؟",
+      text: "لا يمكنك التراجع عن هذا الحذف",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "حذف",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMutation.mutate(id);
+      }
+    });
+  };
 
   //   table coulmn
   const columns = useMemo(() => [
@@ -293,7 +328,7 @@ export default function Company() {
             </button>
           </NavLink>
           <button
-            onClick={() => console.log(row.original._id)}
+            onClick={() => handelDelete(row.original._id)}
             className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
           >
             <BsTrash2 className="w-4 h-4" />
@@ -313,7 +348,9 @@ export default function Company() {
           <Button variant="secondary" icon={<FaDownload />}>
             تصدير اكسيل
           </Button>
-          <Button icon={<FaPlus />}>اضافة شركة</Button>
+          <Button onClick={() => navigate("/company/new")} icon={<FaPlus />}>
+            اضافة شركة
+          </Button>
         </div>
       </div>
       <div className="flex items-center justify-between">

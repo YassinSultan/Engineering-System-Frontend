@@ -1,7 +1,10 @@
 import React, { forwardRef, useState } from "react";
 
 const FileInput = forwardRef(
-  ({ id = "fileInput", onChange, multiple, ...props }, ref) => {
+  (
+    { label = "بيانات", id = "fileInput", onChange, multiple, ...props },
+    ref
+  ) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
 
     const handleChange = (e) => {
@@ -37,6 +40,7 @@ const FileInput = forwardRef(
 
     return (
       <div className="w-full my-2">
+        <p>{label}</p>
         {/* Upload Box */}
         <div className="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border border-dashed rounded-lg">
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
