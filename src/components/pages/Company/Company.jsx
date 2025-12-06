@@ -391,7 +391,7 @@ export default function Company() {
             onSortingChange={setSorting}
           />
         ) : (
-          <div className="flex items-center justify-center h-40 border border-dashed border-primary-500">
+          <div className="flex items-center justify-center h-40 border border-dashed border-primary-500 rounded-lg">
             <span className="text-primary-500">لا يوجد شركات</span>
           </div>
         )}
