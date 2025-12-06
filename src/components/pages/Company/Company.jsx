@@ -16,6 +16,7 @@ import DataTable from "../../common/DataTabel/DataTable";
 import { FiRefreshCcw } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import Loading from "../../common/Loading/Loading";
 const fields = [
   {
     value: "companyCode",
@@ -337,6 +338,7 @@ export default function Company() {
       ),
     },
   ]);
+  if (isLoading) return <Loading />;
   return (
     <>
       <div className="flex justify-between items-center">
@@ -374,19 +376,25 @@ export default function Company() {
       </div>
       {/* Table */}
       <div>
-        <DataTable
-          data={res?.data || []}
-          columns={columns}
-          loading={isLoading}
-          pageCount={res?.totalPages || 0}
-          totalRecords={res?.total || 0}
-          pageIndex={pageIndex}
-          pageSize={pageSize}
-          sorting={sorting}
-          onPageChange={setPageIndex}
-          onPageSizeChange={setPageSize}
-          onSortingChange={setSorting}
-        />
+        {res?.data?.length > 0 ? (
+          <DataTable
+            data={res?.data || []}
+            columns={columns}
+            loading={isLoading}
+            pageCount={res?.totalPages || 0}
+            totalRecords={res?.total || 0}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            sorting={sorting}
+            onPageChange={setPageIndex}
+            onPageSizeChange={setPageSize}
+            onSortingChange={setSorting}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-40 border border-dashed border-primary-500">
+            <span className="text-primary-500">لا يوجد شركات</span>
+          </div>
+        )}
       </div>
     </>
   );
