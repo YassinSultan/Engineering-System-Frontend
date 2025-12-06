@@ -1,4 +1,5 @@
 import api from "./axiosInstance";
+import { saveAs } from "file-saver";
 
 export const getCompanies = async (filters) => {
     const res = await api.get("/companies", { params: filters });
@@ -31,4 +32,21 @@ export const updateCompanyAPI = async ({ id, formData }) => {
 export const deleteCompany = async (id) => {
     const res = await api.delete(`/companies/${id}`);
     return res.data;
+};
+
+// export excel
+export const exportCompanies = async ({ search = "", filters = {} } = {}) => {
+    const payload = {
+        search,
+        filters: JSON.stringify(filters), // نفس اللي في الـ backend
+    };
+
+    const response = await api.post("/companies/export", payload, {
+        responseType: "blob", // الأهم جدًا
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    const filename = `الشركات_${today}.xlsx`;
+
+    saveAs(response.data, filename);
 };

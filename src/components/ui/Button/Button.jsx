@@ -9,6 +9,7 @@ export default function Button({
   disabled = false,
   icon = null,
   className = "",
+  type = "button",
   ...props
 }) {
   const baseStyles =
@@ -40,6 +41,7 @@ export default function Button({
 
   return (
     <button
+      type={type}
       className={clsx(
         baseStyles,
         variants[variant],

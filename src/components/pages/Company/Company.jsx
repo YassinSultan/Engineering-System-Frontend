@@ -5,6 +5,7 @@ import { FaDownload, FaPlus } from "react-icons/fa";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import {
   deleteCompany,
+  exportCompanies,
   getCompanies,
   suggestionFilter,
 } from "../../../api/companyAPI";
@@ -103,6 +104,26 @@ export default function Company() {
         "فشل حذف الشركة: " + (error.response?.data?.message || error.message)
       );
       toast.error("فشل حذف الشركة");
+    },
+  });
+  const excelMutation = useMutation({
+    mutationKey: ["export-companies"],
+    mutationFn: () =>
+      exportCompanies({
+        search: globalFilter, // البحث الحالي
+        filters: {}, // لو عندك فلاتر متقدمة، مررها هنا
+        // مثال: filters: advancedFilters,
+      }),
+    onSuccess: () => {
+      toast.success("تم تصدير الملف بنجاح!");
+    },
+    onError: (error) => {
+      if (error.response?.status === 404) {
+        toast.error("لا توجد بيانات للتصدير بناءً على الفلاتر الحالية");
+      } else {
+        toast.error("فشل في تصدير الملف");
+      }
+      console.error("Export error:", error);
     },
   });
   const handelDelete = (id) => {
@@ -347,8 +368,13 @@ export default function Company() {
           subTitle="عرض وإدارة جميع الشركات المسجلة في النظام"
         />
         <div className="flex gap-2">
-          <Button variant="secondary" icon={<FaDownload />}>
-            تصدير اكسيل
+          <Button
+            variant="secondary"
+            icon={<FaDownload />}
+            onClick={() => excelMutation.mutate()} // ← لازم .mutate()
+            disabled={excelMutation.isPending} // ← loading state
+          >
+            {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
           </Button>
           <Button onClick={() => navigate("/company/new")} icon={<FaPlus />}>
             اضافة شركة
