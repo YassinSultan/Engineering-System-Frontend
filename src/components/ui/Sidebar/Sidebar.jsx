@@ -145,7 +145,6 @@ const menu = [
 ];
 export default function Sidebar() {
   const { profile } = useSelector((state) => state.auth);
-  console.log(profile);
   const isOpen = useSelector((state) => state.sidebar.isOpen);
   const [openDropdowns, setOpenDropdowns] = useState([]);
   const dispatch = useDispatch();
@@ -240,12 +239,12 @@ export default function Sidebar() {
         <div className="border-t border-primary-200 py-2">
           {profile && (
             <>
-              <div className="flex items-center py-2 px-1 border rounded-lg my-2 border-base cursor-pointer">
+              <NavLink
+                to={"/profile"}
+                className="flex items-center py-2 px-1 border rounded-lg my-2 border-base cursor-pointer"
+              >
                 <div>
-                  <img
-                    src={`https://ui-avatars.com/api/?name=${profile.data.fullName}&background=random&rounded=true&size=50`}
-                    alt="user-name"
-                  />
+                  <img src={profile?.data.avatar} alt="user-name" />
                 </div>
                 {isOpen && (
                   <>
@@ -257,7 +256,7 @@ export default function Sidebar() {
                     </div>
                   </>
                 )}
-              </div>
+              </NavLink>
             </>
           )}
 

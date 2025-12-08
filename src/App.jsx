@@ -15,6 +15,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
 import Forbidden from "./components/pages/Forbidden/Forbidden";
+import Profile from "./components/pages/Profile/Profile";
+import UpdateProfile from "./components/pages/Profile/UpdateProfile";
 
 const router = createBrowserRouter([
   {
@@ -34,7 +36,22 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/edit",
+        element: (
+          <ProtectedRoute>
+            <UpdateProfile />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "company",
         element: (
