@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router";
 import ThemeButton from "../../ui/ThemeButton/ThemeButton";
 import Navbar from "../../ui/Navbar/Navbar";
 import Sidebar from "../../ui/Sidebar/Sidebar";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserProfile } from "../../../features/auth/authSlice";
 
 export default function MainLayout() {
+  const dispatch = useDispatch();
+  const { token, profile } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (token && !profile) {
+      dispatch(fetchUserProfile());
+    }
+  }, [token, profile, dispatch]);
   return (
     <>
       <div className="h-screen flex overflow-hidden">

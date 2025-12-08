@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { BiHome, BiPackage } from "react-icons/bi";
+import { BiHome, BiLogOut, BiPackage } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router";
+import Button from "../Button/Button";
+import { logout } from "../../../features/auth/authSlice";
 
 const menu = [
   {
@@ -142,9 +144,11 @@ const menu = [
   },
 ];
 export default function Sidebar() {
+  const { profile } = useSelector((state) => state.auth);
+  console.log(profile);
   const isOpen = useSelector((state) => state.sidebar.isOpen);
   const [openDropdowns, setOpenDropdowns] = useState([]);
-
+  const dispatch = useDispatch();
   const toggleDropdown = (index) => {
     setOpenDropdowns((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
@@ -161,75 +165,114 @@ export default function Sidebar() {
     ${isOpen ? "w-56" : "w-17"}
   `}
     >
-      <div className="flex flex-col h-full overflow-y-auto py-6 px-0 space-y-1">
-        {menu.map((item, index) => (
-          <div key={index}>
-            {item.subMenu ? (
-              <>
-                {/* Dropdown Header */}
-                <button
-                  onClick={() => toggleDropdown(index)}
-                  className="w-full flex items-center justify-between px-4 py-3 font-medium rounded-lg  transition-all duration-200 group cursor-pointer"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-primary">{item.icon}</span>
-                    {isOpen && <span>{item.label}</span>}
-                  </div>
-                  {isOpen && (
-                    <IoIosArrowDown
-                      className={`size-5 transition-transform duration-300 ${
-                        isDropdownOpen(index) ? "-rotate-180" : ""
-                      }`}
-                    />
-                  )}
-                </button>
-
-                {/* Dropdown Items */}
-                {isOpen && isDropdownOpen(index) && (
-                  <ul
-                    className={`mr-6 space-y-1 transition-all duration-300 ease-in-out overflow-hidden ${
-                      isDropdownOpen(index)
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    } border-s-2 ps-2`}
+      <div className="flex flex-col justify-between h-full">
+        {/* menu */}
+        <div className="flex flex-col h-full overflow-y-auto py-6 px-0 space-y-1">
+          {menu.map((item, index) => (
+            <div key={index}>
+              {item.subMenu ? (
+                <>
+                  {/* Dropdown Header */}
+                  <button
+                    onClick={() => toggleDropdown(index)}
+                    className="w-full flex items-center justify-between px-4 py-3 font-medium transition-all duration-200 group cursor-pointer"
                   >
-                    {item.subMenu.map((subItem, subIndex) => (
-                      <li key={subIndex}>
-                        <NavLink
-                          to={`${item.path}${subItem.path}`}
-                          className={({ isActive }) =>
-                            `block px-4 py-2.5 text-sm rounded-md transition-colors ${
-                              isActive
-                                ? "bg-primary-200 text-primary-content-200 font-medium"
-                                : "hover:bg-primary-100 hover:text-primary-content-100"
-                            }`
-                          }
-                        >
-                          {subItem.label}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
+                    <div className="flex items-center gap-3">
+                      <span className="text-primary">{item.icon}</span>
+                      {isOpen && <span>{item.label}</span>}
+                    </div>
+                    {isOpen && (
+                      <IoIosArrowDown
+                        className={`size-5 transition-transform duration-300 ${
+                          isDropdownOpen(index) ? "-rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </button>
+
+                  {/* Dropdown Items */}
+                  {isOpen && isDropdownOpen(index) && (
+                    <ul
+                      className={`mr-6 space-y-1 transition-all duration-300 ease-in-out overflow-hidden ${
+                        isDropdownOpen(index)
+                          ? "max-h-96 opacity-100"
+                          : "max-h-0 opacity-0"
+                      } border-s-2 ps-2`}
+                    >
+                      {item.subMenu.map((subItem, subIndex) => (
+                        <li key={subIndex}>
+                          <NavLink
+                            to={`${item.path}${subItem.path}`}
+                            className={({ isActive }) =>
+                              `block px-4 py-2.5 text-sm rounded-md transition-colors ${
+                                isActive
+                                  ? "bg-primary-200 text-primary-content-200 font-medium"
+                                  : "hover:bg-primary-100 hover:text-primary-content-100"
+                              }`
+                            }
+                          >
+                            {subItem.label}
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                /* Regular Menu Item */
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-primary-200 text-primary-content-200 font-medium shadow-md"
+                        : "hover:bg-primary-100 hover:text-primary-content-100"
+                    }`
+                  }
+                >
+                  <span className="text-primary">{item.icon}</span>
+                  {isOpen && <span>{item.label}</span>}
+                </NavLink>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-primary-200 py-2">
+          {profile && (
+            <>
+              <div className="flex items-center py-2 px-1 border rounded-lg my-2 border-base cursor-pointer">
+                <div>
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${profile.data.fullName}&background=random&rounded=true&size=50`}
+                    alt="user-name"
+                  />
+                </div>
+                {isOpen && (
+                  <>
+                    <div className="flex flex-col flex-1">
+                      <span className="px-2 font-bold">
+                        {profile.data.fullName}
+                      </span>
+                      <span className="px-2 text-xs">{profile.data.role}</span>
+                    </div>
+                  </>
                 )}
-              </>
-            ) : (
-              /* Regular Menu Item */
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 font-medium rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-primary-200 text-primary-content-200 font-medium shadow-md"
-                      : "hover:bg-primary-100 hover:text-primary-content-100"
-                  }`
-                }
-              >
-                <span className="text-primary">{item.icon}</span>
-                {isOpen && <span>{item.label}</span>}
-              </NavLink>
-            )}
-          </div>
-        ))}
+              </div>
+            </>
+          )}
+
+          <Button
+            type="button"
+            variant="danger"
+            className="w-full"
+            onClick={() => dispatch(logout())}
+          >
+            <span>
+              <BiLogOut className="size-5" />
+            </span>
+            {isOpen && <span>تسجيل الخروج</span>}
+          </Button>
+        </div>
       </div>
     </div>
   );

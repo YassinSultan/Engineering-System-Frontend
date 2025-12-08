@@ -86,6 +86,12 @@ export default function Company() {
         sortBy: sorting[0]?.id || "createdAt",
         sortOrder: sorting[0]?.desc ? "desc" : "asc",
       }),
+    onSuccess: () => {
+      toast.success("تم جلب الشركات بنجاح");
+    },
+    onError: () => {
+      toast.error("حدث خطاء اثناء جلب الشركات");
+    },
   });
   const { data: suggestions } = useQuery({
     queryKey: ["suggestions", searchField, searchString],
