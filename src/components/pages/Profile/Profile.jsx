@@ -75,7 +75,7 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          <div className="bg-base p-2 flex flex-col items-center py-5 h-fit w-full">
+          <div className="bg-base p-2 flex flex-col items-center py-5 h-fit w-full shadow-md">
             <div>
               <img src={profile?.data.avatar} alt="user-name" />
             </div>
