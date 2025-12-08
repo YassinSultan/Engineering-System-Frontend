@@ -17,6 +17,7 @@ import { Toaster } from "react-hot-toast";
 import Forbidden from "./components/pages/Forbidden/Forbidden";
 import Profile from "./components/pages/Profile/Profile";
 import UpdateProfile from "./components/pages/Profile/UpdateProfile";
+import ChangePassword from "./components/pages/Profile/ChangePassword";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "profile/change-password",
+        element: (
+          <ProtectedRoute>
+            <ChangePassword />
           </ProtectedRoute>
         ),
       },

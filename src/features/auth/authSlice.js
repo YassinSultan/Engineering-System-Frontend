@@ -63,7 +63,7 @@ const authSlice = createSlice({
             .addCase(fetchUserProfile.fulfilled, (state, action) => {
                 state.loading = false;
                 state.profile = action.payload;
-                state.profile.data.avatar = `https://ui-avatars.com/api/?name=${action.payload?.data.fullName}&background=random&rounded=true&size=120`;
+                state.profile.data.avatar = `https://ui-avatars.com/api/?name=${action.payload?.data.fullName}&background=random&rounded=true&size=50`;
             })
             .addCase(fetchUserProfile.rejected, (state, action) => {
                 state.loading = false;

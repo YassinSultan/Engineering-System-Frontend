@@ -3,7 +3,7 @@ import React, { forwardRef } from "react";
 const Input = forwardRef(
   ({ label = "بيانات", type = "text", id, error, ...props }, ref) => {
     const inputId = id || "floating_" + label;
-    console.log(props);
+
     return (
       <>
         <div className="mb-2">

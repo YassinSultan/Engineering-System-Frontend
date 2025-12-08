@@ -6,3 +6,7 @@ export const updateProfile = async (data) => {
     });
     return res.data;
 };
+export const changePassword = async (data) => {
+    const res = await api.patch("/profile/change-password", data);
+    return res.data;
+};

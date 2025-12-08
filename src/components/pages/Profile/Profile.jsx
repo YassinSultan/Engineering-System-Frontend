@@ -77,7 +77,12 @@ export default function Profile() {
           </div>
           <div className="bg-base p-2 flex flex-col items-center py-5 h-fit w-full shadow-md">
             <div>
-              <img src={profile?.data.avatar} alt="user-name" />
+              <img
+                src={profile?.data.avatar}
+                alt="user-name"
+                width={100}
+                height={100}
+              />
             </div>
             <div className="text-center">
               <h5 className="text-2xl my-2 font-bold">
@@ -91,7 +96,7 @@ export default function Profile() {
               </Button>
               <Button
                 variant="secondary"
-                onClick={() => navigate("/change-password")}
+                onClick={() => navigate("/profile/change-password")}
               >
                 تغيير كلمة المرور
               </Button>
