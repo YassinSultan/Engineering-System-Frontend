@@ -19,6 +19,7 @@ import Profile from "./components/pages/Profile/Profile";
 import UpdateProfile from "./components/pages/Profile/UpdateProfile";
 import ChangePassword from "./components/pages/Profile/ChangePassword";
 import User from "./components/pages/User/User";
+import AddUser from "./components/pages/User/AddUser";
 
 const router = createBrowserRouter([
   {
@@ -91,6 +92,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requirePermission="users:read">
             <User />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "users/new",
+        element: (
+          <ProtectedRoute requirePermission="users:create">
+            <AddUser />
           </ProtectedRoute>
         ),
       },

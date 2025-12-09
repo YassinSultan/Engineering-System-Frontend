@@ -276,7 +276,7 @@ export default function User() {
           >
             {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
           </Button>
-          <Button onClick={() => navigate("/user/new")} icon={<FaPlus />}>
+          <Button onClick={() => navigate("/users/new")} icon={<FaPlus />}>
             اضافة مستخدم
           </Button>
         </div>
