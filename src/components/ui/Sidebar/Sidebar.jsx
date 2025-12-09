@@ -18,6 +18,21 @@ const menu = [
     path: "/company",
   },
   {
+    label: "ادارة المستخدمين",
+    icon: <BiPackage className="size-5" />,
+    path: "/users",
+    subMenu: [
+      {
+        label: "إضافة مشروع",
+        path: "/new",
+      },
+      {
+        label: "قائمة المشروعات",
+        path: "",
+      },
+    ],
+  },
+  {
     label: "المشروعات",
     icon: <BiPackage className="size-5" />,
     path: "/yassin",
