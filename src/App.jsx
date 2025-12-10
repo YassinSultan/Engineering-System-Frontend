@@ -21,6 +21,7 @@ import ChangePassword from "./components/pages/Profile/ChangePassword";
 import User from "./components/pages/User/User";
 import AddUser from "./components/pages/User/AddUser";
 import PermissionsUser from "./components/pages/User/PermissionsUser";
+import UpdateUser from "./components/pages/User/UpdateUser";
 
 const router = createBrowserRouter([
   {
@@ -109,6 +110,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requirePermission="users:updatePermissions">
             <PermissionsUser />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "users/edit/:id",
+        element: (
+          <ProtectedRoute requirePermission="companies:update">
+            <UpdateUser />
           </ProtectedRoute>
         ),
       },

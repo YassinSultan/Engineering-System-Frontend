@@ -7,6 +7,7 @@ import Input from "../../ui/Input/Input";
 import Button from "../../ui/Button/Button";
 import FileInput from "../../ui/FileInput/FileInput";
 import PageTitle from "../../ui/PageTitle/PageTitle";
+import toast from "react-hot-toast";
 
 export default function UpdateCompany() {
   const { id } = useParams();
@@ -60,17 +61,18 @@ export default function UpdateCompany() {
   const mutation = useMutation({
     mutationFn: updateCompanyAPI,
     onSuccess: () => {
-      alert("تم تحديث الشركة بنجاح");
+      toast.success("تم تحديث الشركة بنجاح");
       queryClient.invalidateQueries({ queryKey: ["company", id] });
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (err) => {
       console.error(err);
-      alert("حدث خطأ أثناء التحديث");
+      toast.error("حدث خطأ أثناء التحديث");
     },
   });
 
   const onSubmit = (data) => {
+    console.log(data);
     const formData = new FormData();
 
     // Append all text fields (only if changed or always safe)

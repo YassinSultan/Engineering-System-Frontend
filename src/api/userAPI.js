@@ -20,10 +20,8 @@ export const createUser = async (data) => {
     return response.data;
 };
 
-export const updateUser = async ({ id, formData }) => {
-    const res = await api.patch(`/users/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
+export const updateUser = async ({ id, data }) => {
+    const res = await api.patch(`/users/${id}`, data);
     return res.data;
 };
 

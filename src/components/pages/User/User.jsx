@@ -134,6 +134,7 @@ export default function User() {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "حذف",
+      cancelButtonText: "الغاء",
     }).then((result) => {
       if (result.isConfirmed) {
         deleteMutation.mutate(id);
@@ -228,9 +229,11 @@ export default function User() {
       header: "الصلاحيات",
       accessorKey: "permissions",
       cell: ({ row }) => (
-        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.permissions.map((p) => p).join(" , ")}
-        </span>
+        <div className="flex flex-col text-end gap-2">
+          {row.original.permissions.map((p) => (
+            <span className="font-mono text-xs px-2 py-1 rounded">{p}</span>
+          ))}
+        </div>
       ),
     },
     {
