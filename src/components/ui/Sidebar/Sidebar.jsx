@@ -128,7 +128,7 @@ export default function Sidebar() {
                           subItem.path
                         }`}
                         className={({ isActive }) =>
-                          `block px-4 py-2 text-sm rounded-md transition-colors block ${
+                          `block px-4 py-2 text-sm rounded-md transition-colors  ${
                             isActive
                               ? "bg-primary-200 text-primary-content-200 font-medium"
                               : "hover:bg-primary-100 hover:text-primary-content-100"
