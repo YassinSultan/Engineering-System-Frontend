@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 import Loading from "../../common/Loading/Loading";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Button from "../../ui/Button/Button";
-import { FaDownload, FaPlus } from "react-icons/fa";
+import { FaDownload, FaKeycdn, FaPlus } from "react-icons/fa";
 import SearchInput from "../../ui/SearchInput/SearchInput";
 import { FiRefreshCcw } from "react-icons/fi";
 import DataTable from "../../common/DataTabel/DataTable";
@@ -199,7 +199,7 @@ export default function User() {
       accessorKey: "phones",
       cell: ({ row }) => (
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.phones.map((p) => p.phone).join(", ")}
+          {row.original.phones.map((p) => p).join(" , ")}
         </span>
       ),
     },
@@ -229,7 +229,7 @@ export default function User() {
       accessorKey: "permissions",
       cell: ({ row }) => (
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.permissions.map((p) => p.name).join(", ")}
+          {row.original.permissions.map((p) => p).join(" , ")}
         </span>
       ),
     },
@@ -239,14 +239,19 @@ export default function User() {
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <NavLink to={`/user/view/${row.original._id}`}>
+          <NavLink to={`/users/view/${row.original._id}`}>
             <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
               <BsEye className="w-4 h-4" />
             </button>
           </NavLink>
-          <NavLink to={`/user/edit/${row.original._id}`}>
+          <NavLink to={`/users/edit/${row.original._id}`}>
             <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
               <BiEdit className="w-4 h-4" />
+            </button>
+          </NavLink>
+          <NavLink to={`/users/permissions/${row.original._id}`}>
+            <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
+              <FaKeycdn className="w-4 h-4" />
             </button>
           </NavLink>
           <button

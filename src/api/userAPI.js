@@ -5,20 +5,18 @@ export const getUsers = async (filters) => {
     const res = await api.get("/users", { params: filters });
     return res.data;
 };
-export const getUser = async (filters) => {
-    const res = await api.get(`/users/${filters.id}`, { params: filters });
-    return res;
+export const getUser = async ({ id, ...filters }) => {
+    const res = await api.get(`/users/${id}`, {
+        params: filters,
+    });
+    return res.data;
 };
 export const suggestionFilter = async (field, search) => {
     const res = await api.get(`/users/filter/${field}`, { params: search });
     return res.data;
 };
-export const createUser = async (formData) => {
-    const response = await api.post("/users", formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+export const createUser = async (data) => {
+    const response = await api.post("/users", data);
     return response.data;
 };
 
@@ -49,4 +47,9 @@ export const exportUsers = async ({ search = "", filters = {} } = {}) => {
     const filename = `المستخدمين_${today}.xlsx`;
 
     saveAs(response.data, filename);
+};
+// updateUserPermissions
+export const updateUserPermissions = async ({ id, data }) => {
+    const res = await api.patch(`/users/${id}/permissions`, data);
+    return res.data;
 };

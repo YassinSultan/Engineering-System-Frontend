@@ -183,7 +183,7 @@ export default function Sidebar() {
           {profile && (
             <NavLink
               to="/profile"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary-100 transition-colors mb-3"
+              className="flex items-center gap-3 rounded-lg hover:bg-primary-100 transition-colors mb-3"
             >
               <img
                 src={profile?.data?.avatar || "/default-avatar.png"}

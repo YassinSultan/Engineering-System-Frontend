@@ -69,7 +69,7 @@ export default function Profile() {
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
                 <span className="w-1/4 font-semibold"> الصلاحيات</span>
                 <span className="w-3/4 font-light">
-                  {profile?.data.permissions.map((p) => p.name).join(", ") ||
+                  {profile?.data.permissions.map((p) => p).join(" , ") ||
                     "----"}
                 </span>
               </div>
