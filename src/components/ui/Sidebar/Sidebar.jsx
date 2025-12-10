@@ -188,7 +188,7 @@ export default function Sidebar() {
               <img
                 src={profile?.data?.avatar || "/default-avatar.png"}
                 alt="avatar"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-9 h-9 rounded-full object-cover"
               />
               {isOpen && (
                 <div className="flex flex-col">
