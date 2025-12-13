@@ -271,7 +271,7 @@ export default function AddCompany() {
           </div>
         </div>
         <div>
-          <Button>اضافة</Button>
+          <Button type="submit">اضافة</Button>
         </div>
       </form>
     </>
