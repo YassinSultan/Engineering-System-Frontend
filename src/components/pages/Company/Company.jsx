@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import Loading from "../../common/Loading/Loading";
 import { cn } from "../../../lib/utils";
+import AttachmentsModal from "../../common/AttachmentsModal/AttachmentsModal";
 const fields = [
   {
     value: "companyCode",
@@ -66,6 +67,11 @@ const fields = [
   },
 ];
 export default function Company() {
+  const [isAttachmentsModalOpen, setIsAttachmentsModalOpen] = useState(false);
+  const [currentAttachments, setCurrentAttachments] = useState({
+    mainFile: null,
+    additionalFiles: [],
+  });
   const [columnVisibility, setColumnVisibility] = useState({});
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
   const [pageIndex, setPageIndex] = useState(0);
@@ -308,34 +314,45 @@ export default function Company() {
       id: "files",
       header: "الملفات",
       enableSorting: false,
+      enableHiding: false, // اختياري: ليبقى دائمًا ظاهر
       cell: ({ row }) => {
-        const hasApprovalFile = !!row.original.securityApprovalFile;
-        const documentsCount = row.original.companyDocuments?.length || 0;
-        const totalFiles = (hasApprovalFile ? 1 : 0) + documentsCount;
+        const mainFile = row.original.securityApprovalFile;
+        const additionalFiles = row.original.companyDocuments || [];
+        const totalFiles = (mainFile ? 1 : 0) + additionalFiles.length;
 
         if (totalFiles === 0) {
           return <span className="text-muted-foreground text-xs">لا يوجد</span>;
         }
 
+        const openModal = () => {
+          setCurrentAttachments({
+            mainFile: mainFile || null,
+            additionalFiles,
+          });
+          setIsAttachmentsModalOpen(true);
+        };
+
         return (
           <div className="flex items-center justify-center gap-2">
-            {hasApprovalFile && (
+            {mainFile && (
               <button
-                onClick={() => console.log(row.original.securityApprovalFile)}
+                onClick={openModal}
                 className="p-1.5 rounded-md bg-success/10 text-success hover:bg-success/20 transition-colors"
-                title="الموافقة الأمنية"
+                title="ملف الموافقة الأمنية"
               >
                 <BsFileText className="w-4 h-4" />
               </button>
             )}
-            {documentsCount > 0 && (
+            {additionalFiles.length > 0 && (
               <button
-                onClick={() => console.log(row.original.companyDocuments)}
+                onClick={openModal}
                 className="p-1.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors flex items-center gap-1"
                 title="أوراق الشركة"
               >
                 <BiFolder className="w-4 h-4" />
-                <span className="text-xs font-medium">{documentsCount}</span>
+                <span className="text-xs font-medium">
+                  {additionalFiles.length}
+                </span>
               </button>
             )}
           </div>
@@ -519,6 +536,15 @@ export default function Company() {
           </div>
         )}
       </div>
+      <AttachmentsModal
+        isOpen={isAttachmentsModalOpen}
+        onClose={() => setIsAttachmentsModalOpen(false)}
+        title="ملفات الشركة"
+        mainFile={currentAttachments.mainFile}
+        mainFileLabel="ملف الموافقة الأمنية"
+        additionalFiles={currentAttachments.additionalFiles}
+        additionalFilesLabel="أوراق الشركة"
+      />
     </>
   );
 }
