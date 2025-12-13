@@ -1,7 +1,7 @@
 import React from "react";
 import { BsFileEarmarkText, BsDownload } from "react-icons/bs";
 import Button from "../../ui/Button/Button";
-import Modal from "../Modal/Modal";
+import Modal from "../../ui/Modal/Modal";
 
 const AttachmentsModal = ({
   isOpen,
