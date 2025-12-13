@@ -18,8 +18,8 @@ import { FiRefreshCcw } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import Loading from "../../common/Loading/Loading";
-import { cn } from "../../../lib/utils";
 import AttachmentsModal from "../../common/AttachmentsModal/AttachmentsModal";
+import ColumnSelector from "../../common/ColumnSelector/ColumnSelector";
 const fields = [
   {
     value: "companyCode",
@@ -426,90 +426,15 @@ export default function Company() {
           <Button onClick={() => refetch()}>
             <FiRefreshCcw />
           </Button>
-          <div className="relative">
-            <Button
-              variant="secondary"
-              onClick={() => setIsColumnSelectorOpen(!isColumnSelectorOpen)}
-              className="flex items-center gap-2"
-            >
-              الأعمدة
-              <BiChevronDown
-                className={cn(
-                  "w-4 h-4 transition-transform",
-                  isColumnSelectorOpen && "rotate-180"
-                )}
-              />
-            </Button>
-
-            {isColumnSelectorOpen && (
-              <div className="absolute left-0 mt-2 w-fit bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden text-nowrap">
-                <div className="p-3 border-b border-border">
-                  <p className="text-sm font-medium">إظهار / إخفاء الأعمدة</p>
-                </div>
-                <div className="max-h-96 overflow-y-auto py-2">
-                  {columns.map((column) => {
-                    // تجاهل عمود الإجراءات وعمود الملفات لأنهم دائمًا ظاهرين
-                    if (column.id === "actions" || column.id === "files")
-                      return null;
-
-                    const isVisible = columnVisibility[column.id] !== false; // default true
-
-                    return (
-                      <label
-                        key={column.id}
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-accent cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={isVisible}
-                          onChange={(e) => {
-                            setColumnVisibility({
-                              ...columnVisibility,
-                              [column.id]: e.target.checked,
-                            });
-                          }}
-                          className="w-4 h-4 text-primary rounded focus:ring-primary"
-                        />
-                        <span className="text-sm">{column.header}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-                <div className="p-2 border-t border-border flex justify-between">
-                  <button
-                    onClick={() => {
-                      const allVisible = columns.reduce((acc, col) => {
-                        if (col.id !== "actions" && col.id !== "files") {
-                          acc[col.id] = true;
-                        }
-                        return acc;
-                      }, {});
-                      setColumnVisibility(allVisible);
-                    }}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    إظهار الكل
-                  </button>
-                  <button
-                    onClick={() => {
-                      const onlyEssential = columns.reduce((acc, col) => {
-                        if (col.id === "companyName" || col.id === "actions") {
-                          acc[col.id] = true;
-                        } else if (col.id !== "files") {
-                          acc[col.id] = false;
-                        }
-                        return acc;
-                      }, {});
-                      setColumnVisibility(onlyEssential);
-                    }}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    الأساسيات فقط
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          <ColumnSelector
+            columns={columns}
+            columnVisibility={columnVisibility}
+            setColumnVisibility={setColumnVisibility}
+            isOpen={isColumnSelectorOpen}
+            setIsOpen={setIsColumnSelectorOpen}
+            essentialColumnIds={["companyName"]}
+            excludeColumns={["actions"]}
+          />
         </div>
       </div>
       {/* Table */}
