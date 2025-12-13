@@ -11,13 +11,14 @@ import {
 } from "../../../api/companyAPI";
 import SearchInput from "../../ui/SearchInput/SearchInput";
 import { BsEye, BsFileText, BsTrash2 } from "react-icons/bs";
-import { BiEdit, BiFolder } from "react-icons/bi";
+import { BiChevronDown, BiEdit, BiFolder } from "react-icons/bi";
 import { NavLink, useNavigate } from "react-router";
 import DataTable from "../../common/DataTabel/DataTable";
 import { FiRefreshCcw } from "react-icons/fi";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import Loading from "../../common/Loading/Loading";
+import { cn } from "../../../lib/utils";
 const fields = [
   {
     value: "companyCode",
@@ -65,6 +66,8 @@ const fields = [
   },
 ];
 export default function Company() {
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [searchField, setSearchField] = useState("all"); // default field
@@ -402,9 +405,95 @@ export default function Company() {
           />
         </div>
         {/* refresh button */}
-        <Button onClick={() => refetch()}>
-          <FiRefreshCcw />
-        </Button>
+        <div className="flex items-center gap-2 flex-row-reverse">
+          <Button onClick={() => refetch()}>
+            <FiRefreshCcw />
+          </Button>
+          <div className="relative">
+            <Button
+              variant="secondary"
+              onClick={() => setIsColumnSelectorOpen(!isColumnSelectorOpen)}
+              className="flex items-center gap-2"
+            >
+              الأعمدة
+              <BiChevronDown
+                className={cn(
+                  "w-4 h-4 transition-transform",
+                  isColumnSelectorOpen && "rotate-180"
+                )}
+              />
+            </Button>
+
+            {isColumnSelectorOpen && (
+              <div className="absolute left-0 mt-2 w-fit bg-background border border-border rounded-lg shadow-lg z-50 overflow-hidden text-nowrap">
+                <div className="p-3 border-b border-border">
+                  <p className="text-sm font-medium">إظهار / إخفاء الأعمدة</p>
+                </div>
+                <div className="max-h-96 overflow-y-auto py-2">
+                  {columns.map((column) => {
+                    // تجاهل عمود الإجراءات وعمود الملفات لأنهم دائمًا ظاهرين
+                    if (column.id === "actions" || column.id === "files")
+                      return null;
+
+                    const isVisible = columnVisibility[column.id] !== false; // default true
+
+                    return (
+                      <label
+                        key={column.id}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-accent cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isVisible}
+                          onChange={(e) => {
+                            setColumnVisibility({
+                              ...columnVisibility,
+                              [column.id]: e.target.checked,
+                            });
+                          }}
+                          className="w-4 h-4 text-primary rounded focus:ring-primary"
+                        />
+                        <span className="text-sm">{column.header}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <div className="p-2 border-t border-border flex justify-between">
+                  <button
+                    onClick={() => {
+                      const allVisible = columns.reduce((acc, col) => {
+                        if (col.id !== "actions" && col.id !== "files") {
+                          acc[col.id] = true;
+                        }
+                        return acc;
+                      }, {});
+                      setColumnVisibility(allVisible);
+                    }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    إظهار الكل
+                  </button>
+                  <button
+                    onClick={() => {
+                      const onlyEssential = columns.reduce((acc, col) => {
+                        if (col.id === "companyName" || col.id === "actions") {
+                          acc[col.id] = true;
+                        } else if (col.id !== "files") {
+                          acc[col.id] = false;
+                        }
+                        return acc;
+                      }, {});
+                      setColumnVisibility(onlyEssential);
+                    }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    الأساسيات فقط
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
       {/* Table */}
       <div>
@@ -421,6 +510,8 @@ export default function Company() {
             onPageChange={setPageIndex}
             onPageSizeChange={setPageSize}
             onSortingChange={setSorting}
+            columnVisibility={columnVisibility}
+            onColumnVisibilityChange={setColumnVisibility}
           />
         ) : (
           <div className="flex items-center justify-center h-40 border border-dashed border-primary-500 rounded-lg">

@@ -2,6 +2,7 @@ import React from "react";
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { cn } from "../../../lib/utils";
@@ -26,6 +27,8 @@ export default function DataTable({
   onPageChange,
   onPageSizeChange,
   onSortingChange,
+  columnVisibility,
+  onColumnVisibilityChange,
 }) {
   const table = useReactTable({
     data,
@@ -36,8 +39,11 @@ export default function DataTable({
     state: {
       pagination: { pageIndex, pageSize },
       sorting,
+      columnVisibility,
     },
+    onColumnVisibilityChange,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   const handleSort = (columnId) => {
