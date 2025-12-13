@@ -20,8 +20,7 @@ export default function Button({
       "bg-primary-500 text-primary-content-500 hover:bg-primary-600 hover:text-primary-content-600 focus:ring-primary-500",
     secondary:
       "bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-400",
-    outline:
-      "border border-gray-400 text-gray-700 hover:bg-gray-100 focus:ring-gray-300",
+    outline: "border border-gray-400 hover:opacity-70 focus:ring-gray-300",
     danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
     success: "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500",
     warning:
