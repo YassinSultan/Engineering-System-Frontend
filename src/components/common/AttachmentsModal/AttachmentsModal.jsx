@@ -2,6 +2,7 @@ import React from "react";
 import { BsFileEarmarkText, BsDownload } from "react-icons/bs";
 import Button from "../../ui/Button/Button";
 import Modal from "../../ui/Modal/Modal";
+import getFileUrl from "../../../lib/getDownladLink";
 
 const AttachmentsModal = ({
   isOpen,
@@ -12,12 +13,6 @@ const AttachmentsModal = ({
   additionalFiles = [], // مصفوفة من المسارات للملفات الإضافية
   additionalFilesLabel = "المرفقات الإضافية",
 }) => {
-  const getFileUrl = (filePath) => {
-    const fileName = filePath.split("/").pop();
-    const url = `http://localhost:10000/api/files/download/${fileName}`;
-    return url;
-  };
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
       <div className="space-y-6">

@@ -22,6 +22,7 @@ import User from "./components/pages/User/User";
 import AddUser from "./components/pages/User/AddUser";
 import PermissionsUser from "./components/pages/User/PermissionsUser";
 import UpdateUser from "./components/pages/User/UpdateUser";
+import SpecificCompany from "./components/pages/Company/SpecificCompany";
 
 const router = createBrowserRouter([
   {
@@ -86,6 +87,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requirePermission="companies:update">
             <UpdateCompany />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/company/view/:id",
+        element: (
+          <ProtectedRoute requirePermission="companies:update">
+            <SpecificCompany />
           </ProtectedRoute>
         ),
       },
