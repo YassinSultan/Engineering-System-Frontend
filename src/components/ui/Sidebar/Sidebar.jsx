@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BiHome, BiLogOut, BiPackage } from "react-icons/bi";
+import { BiBuilding, BiHome, BiLogOut, BiPackage } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router"; // Added useLocation
@@ -177,7 +177,25 @@ export default function Sidebar() {
         <div className="flex flex-col h-full overflow-y-auto py-6 space-y-1">
           {menu.map((item) => renderMenuItem(item))}
         </div>
-
+        {/* ادارة الوحدات */}
+        {profile?.data?.role === "super_admin" && (
+          <NavLink
+            to="/organization-units"
+            end
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 my-2 font-medium transition-all duration-200 rounded-lg ${
+                isActive
+                  ? "bg-primary-200 text-primary-content-200 shadow-md"
+                  : "hover:bg-primary-100 hover:text-primary-content-100"
+              }`
+            }
+          >
+            <span className="text-primary">
+              <BiBuilding />
+            </span>
+            {isOpen && <span>ادارة الوحدات</span>}
+          </NavLink>
+        )}
         {/* User Profile & Logout */}
         <div className="border-t border-primary-200 py-4 px-2">
           {profile && (

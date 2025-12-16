@@ -12,7 +12,7 @@
 /* light mode */
 @theme {
   --color-background: oklch(100% 0 0);
-  --color-base: oklch(98.511% 0.00011 271.152);
+  --color-base: oklch(96% 0.00011 271.152);
   --color-foreground: oklch(0% 0 0);
   --color-primary-50: oklch(95.84% 0.020 245.64);
   --color-primary-100: oklch(91.65% 0.040 244.79);
@@ -42,14 +42,14 @@
 @layer theme {
   .dark {
     --color-background: oklab(21.779% 0 -0.00002);
-    --color-base: oklch(20.463% 0.00002 271.152);
+    --color-base: oklch(25% 0.00002 271.152);
     --color-foreground: oklch(100% 0 0);
     --color-primary-50: oklch(95.84% 0.020 245.64);
     --color-primary-100: oklch(91.65% 0.040 244.79);
     --color-primary-200: oklch(83.53% 0.079 245.43);
     --color-primary-300: oklch(75.74% 0.120 246.68);
     --color-primary-400: oklch(68.57% 0.157 248.93);
-    --color-primary-500: oklch(62.32% 0.189 252.99);
+    --color-primary-500: oklch(62.312% 0.1888 252.97);
     --color-primary-600: oklch(52.97% 0.158 252.63);
     --color-primary-700: oklch(43.20% 0.125 252.04);
     --color-primary-800: oklch(32.84% 0.090 250.91);

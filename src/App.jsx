@@ -23,6 +23,8 @@ import AddUser from "./components/pages/User/AddUser";
 import PermissionsUser from "./components/pages/User/PermissionsUser";
 import UpdateUser from "./components/pages/User/UpdateUser";
 import SpecificCompany from "./components/pages/Company/SpecificCompany";
+import OrganizationUnits from "./components/pages/OrganizationUnits/OrganizationUnits";
+import AddOrganizationUnits from "./components/pages/OrganizationUnits/AddOrganizationUnits";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +65,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <UpdateProfile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "organization-units",
+        element: (
+          <ProtectedRoute>
+            <OrganizationUnits />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "organization-units/new",
+        element: (
+          <ProtectedRoute>
+            <AddOrganizationUnits />
           </ProtectedRoute>
         ),
       },
