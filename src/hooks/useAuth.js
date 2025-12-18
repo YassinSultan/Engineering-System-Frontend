@@ -10,7 +10,7 @@ export const useAuth = () => {
         console.log("profile", profile);
         console.log("claims", claims);
         if (claims?.role === "SUPER_ADMIN") return true;
-        return claims?.permissions?.includes(permission) || false;
+        return claims?.permissions?.map((p) => p.action).includes(permission) || false;
     };
 
     return {

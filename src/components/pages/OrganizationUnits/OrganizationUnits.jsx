@@ -14,6 +14,7 @@ import Button from "../../ui/Button/Button";
 import { BiPlus } from "react-icons/bi";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
+import SimpleOrganizationalTree from "../../ui/SimpleTreeNode/SimpleOrganizationalTree";
 
 export default function OrganizationUnits() {
   const [selectedUnit, setSelectedUnit] = useState(null);
@@ -199,7 +200,7 @@ export default function OrganizationUnits() {
                 <BiPlus />
               </Button>
             </div>
-            <OrganizationalTree data={tree} onSelect={setSelectedUnit} />
+            <SimpleOrganizationalTree data={tree} onSelect={setSelectedUnit} />
           </div>
           {/* specific organization unit data */}
           {selectedUnit && (
