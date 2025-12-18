@@ -7,7 +7,8 @@ export const useAuth = () => {
     const user = profile || claims; // لو الـ profile لسه بيحمل → نستخدم claims
 
     const hasPermission = (permission) => {
-        console.log(claims);
+        console.log("profile", profile);
+        console.log("claims", claims);
         if (claims?.role === "super_admin") return true;
         return claims?.permissions?.includes(permission) || false;
     };

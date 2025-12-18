@@ -1,24 +1,29 @@
 import { QueryClient, useMutation } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { createUser } from "../../../api/userAPI";
 import toast from "react-hot-toast";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Button from "../../ui/Button/Button";
 import Input from "../../ui/Input/Input";
+import OrganizationalTreeModal from "../../common/OrganizationalTreeModal/OrganizationalTreeModal";
 
 export default function AddUser() {
+  const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm({
     defaultValues: {
       phones: [{ phone: "" }],
     },
   });
+  const selectedUnit = watch("organizationalUnit");
   const { fields, append, remove } = useFieldArray({
     control,
     name: "phones",
@@ -37,12 +42,19 @@ export default function AddUser() {
   });
 
   const onSubmit = (data) => {
-    const phones = data.phones.map((p) => {
-      return p.phone;
-    });
-    data.phones = phones;
-    mutation.mutate(data);
+    const payload = {
+      ...data,
+      organizationalUnit: data.organizationalUnit._id,
+      phones: data.phones.map((p) => p.phone),
+    };
+
+    mutation.mutate(payload);
   };
+  useEffect(() => {
+    register("organizationalUnit", {
+      required: "الوحدة التنظيمية مطلوبة",
+    });
+  }, [register]);
   return (
     <>
       <section>
@@ -56,26 +68,18 @@ export default function AddUser() {
         >
           <div>
             <Input
-              label="اسم المستخدم كامل"
-              {...register("fullName", { required: "اسم الشركة مطلوب" })}
+              label="اسم المستخدم عربي"
+              {...register("fullNameArabic", { required: "اسم الشركة مطلوب" })}
               type="text"
-              error={errors.fullName}
+              error={errors.fullNameArabic}
             />
           </div>
           <div>
             <Input
-              label="الوحدة الرئيسية"
-              {...register("mainUnit", { required: "اسم الشركة مطلوب" })}
+              label="اسم المستخدم انجليزي"
+              {...register("fullNameEnglish", { required: "اسم الشركة مطلوب" })}
               type="text"
-              error={errors.mainUnit}
-            />
-          </div>
-          <div>
-            <Input
-              label="الوحدة الفرعية"
-              {...register("subUnit", { required: "اسم الشركة مطلوب" })}
-              type="text"
-              error={errors.subUnit}
+              error={errors.fullNameEnglish}
             />
           </div>
           <div>
@@ -84,14 +88,6 @@ export default function AddUser() {
               {...register("specialization", { required: "اسم الشركة مطلوب" })}
               type="text"
               error={errors.specialization}
-            />
-          </div>
-          <div>
-            <Input
-              label="المكتب"
-              {...register("office", { required: "اسم الشركة مطلوب" })}
-              type="text"
-              error={errors.office}
             />
           </div>
           <div className="col-span-full flex flex-col gap-2">
@@ -155,6 +151,24 @@ export default function AddUser() {
             />
           </div>
           <div className="col-span-full">
+            <label className="block text-sm font-medium mb-1">
+              الوحدة التابع لها
+            </label>
+
+            <div
+              onClick={() => setIsUnitModalOpen(true)}
+              className="border rounded px-3 py-2 cursor-pointer bg-gray-50 hover:bg-gray-100"
+            >
+              {selectedUnit?.name || "اختر الوحدة التابع لها"}
+            </div>
+
+            {errors.organizationalUnit && (
+              <p className="text-red-500 text-sm mt-1">
+                الوحدة التابع لها مطلوبة
+              </p>
+            )}
+          </div>
+          <div className="col-span-full">
             <Button
               type="submit"
               variant="primary"
@@ -164,6 +178,15 @@ export default function AddUser() {
             </Button>
           </div>
         </form>
+        <OrganizationalTreeModal
+          isOpen={isUnitModalOpen}
+          onClose={() => setIsUnitModalOpen(false)}
+          onSelect={(unit) => {
+            setValue("organizationalUnit", unit, {
+              shouldValidate: true,
+            });
+          }}
+        />
       </section>
     </>
   );

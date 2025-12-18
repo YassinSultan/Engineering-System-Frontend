@@ -21,28 +21,16 @@ import { BiEdit } from "react-icons/bi";
 
 const fields = [
   {
-    value: "fullName",
-    label: "اسم المستخدم كامل",
+    value: "fullNameArabic",
+    label: "اسم المستخدم عربي",
   },
   {
-    value: "mainUnit",
-    label: " الوحدة الرئيسية",
-  },
-  {
-    value: "commercialRegister",
-    label: " رقم السجل التجاري",
-  },
-  {
-    value: "subUnit",
-    label: "الوحدة الفرعية",
+    value: "fullNameEnglish",
+    label: "اسم المستخدم انجليزي",
   },
   {
     value: "specialization",
     label: "التخصص",
-  },
-  {
-    value: "office",
-    label: "المكتب",
   },
   {
     value: "username",
@@ -80,6 +68,7 @@ export default function User() {
         sortOrder: sorting[0]?.desc ? "desc" : "asc",
       }),
     onSuccess: () => {
+      console.log(res);
       toast.success("تم جلب المستخدمين بنجاح");
     },
     onError: () => {
@@ -145,32 +134,22 @@ export default function User() {
   //   table coulmn
   const columns = useMemo(() => [
     {
-      id: "fullName",
-      header: "اسم المستخدم",
-      accessorKey: "fullName",
+      id: "fullNameArabic",
+      header: "اسم المستخدم بالعربية",
+      accessorKey: "fullNameArabic",
       cell: ({ row }) => (
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.fullName}
+          {row.original.fullNameArabic}
         </span>
       ),
     },
     {
-      id: "mainUnit",
-      header: "الوحدة الرئيسية",
-      accessorKey: "mainUnit",
+      id: "fullNameEnglish",
+      header: "اسم المستخدم بالانجليزية",
+      accessorKey: "fullNameEnglish",
       cell: ({ row }) => (
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.mainUnit}
-        </span>
-      ),
-    },
-    {
-      id: "subUnit",
-      header: "الوحدة الفرعية",
-      accessorKey: "subUnit",
-      cell: ({ row }) => (
-        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.subUnit}
+          {row.original.fullNameEnglish}
         </span>
       ),
     },
@@ -185,22 +164,22 @@ export default function User() {
       ),
     },
     {
-      id: "office",
-      header: "المكتب",
-      accessorKey: "office",
-      cell: ({ row }) => (
-        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-          {row.original.office}
-        </span>
-      ),
-    },
-    {
       id: "phones",
       header: "رقم الهاتف",
       accessorKey: "phones",
       cell: ({ row }) => (
         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
           {row.original.phones.map((p) => p).join(" , ")}
+        </span>
+      ),
+    },
+    {
+      id: "organizationalUnit",
+      header: "الوحدة التابع لها",
+      accessorKey: "organizationalUnit",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+          {row.original.organizationalUnit?.name}
         </span>
       ),
     },

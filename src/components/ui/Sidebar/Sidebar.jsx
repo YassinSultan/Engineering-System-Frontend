@@ -211,7 +211,7 @@ export default function Sidebar() {
               {isOpen && (
                 <div className="flex flex-col">
                   <span className="font-bold text-sm">
-                    {profile.data.fullName}
+                    {profile.data.fullNameArabic.split(" ")[0]}
                   </span>
                   <span className="text-xs text-gray-500">
                     {profile.data.role}

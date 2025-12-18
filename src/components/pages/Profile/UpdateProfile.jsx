@@ -85,33 +85,20 @@ export default function UpdateProfile() {
               </div>
               <div>
                 <Input
-                  label="الاسم الكامل"
-                  {...register("fullName", { required: "اسم الكامل مطلوب" })}
-                  error={errors.fullName}
+                  label="الاسم الكامل باللغة العربية"
+                  {...register("fullNameArabic", {
+                    required: "اسم الكامل مطلوب",
+                  })}
+                  error={errors.fullNameArabic}
                 />
               </div>
               <div>
                 <Input
-                  label="الوحدة الرئيسية"
-                  {...register("mainUnit", {
-                    required:
-                      profile?.data?.role === "super_admin"
-                        ? false
-                        : "الوحدة الرئيسية مطلوب",
+                  label="الاسم الكامل باللغة الانجليزية"
+                  {...register("fullNameEnglish", {
+                    required: "اسم الكامل مطلوب",
                   })}
-                  error={errors.mainUnit}
-                />
-              </div>
-              <div>
-                <Input
-                  label="الوحدة الفرعية"
-                  {...register("subUnit", {
-                    required:
-                      profile?.data?.role === "super_admin"
-                        ? false
-                        : "الوحدة الفرعية مطلوب",
-                  })}
-                  error={errors.subUnit}
+                  error={errors.fullNameEnglish}
                 />
               </div>
               <div className="col-span-full">

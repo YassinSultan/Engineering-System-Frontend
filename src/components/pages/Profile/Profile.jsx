@@ -19,9 +19,25 @@ export default function Profile() {
             <h3 className="text-xl">المعلومات الشخصية</h3>
             <div className="flex flex-col">
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
-                <span className="w-1/4 font-semibold"> الاسم</span>
+                <span className="w-1/4 font-semibold">
+                  الاسم باللغة العربية
+                </span>
                 <span className="w-3/4 font-light">
-                  {profile?.data.fullName || "----"}
+                  {profile?.data.fullNameArabic || "----"}
+                </span>
+              </div>
+              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
+                <span className="w-1/4 font-semibold">
+                  الاسم باللغة الانجليزية
+                </span>
+                <span className="w-3/4 font-light">
+                  {profile?.data.fullNameEnglish || "----"}
+                </span>
+              </div>
+              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
+                <span className="w-1/4 font-semibold">الوحدة التابع لها</span>
+                <span className="w-3/4 font-light">
+                  {profile?.data.organizationalUnit.name || "----"}
                 </span>
               </div>
               <div className="w-full flex py-4 px-2 border-b border-b-current last:border-b-0">
@@ -31,39 +47,15 @@ export default function Profile() {
                 </span>
               </div>
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
-                <span className="w-1/4 font-semibold"> الوحدة الرئيسية</span>
-                <span className="w-3/4 font-light">
-                  {profile?.data.mainUnit || "----"}
-                </span>
-              </div>
-              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
-                <span className="w-1/4 font-semibold"> الوحدة الفرعية</span>
-                <span className="w-3/4 font-light">
-                  {profile?.data.subUnit || "----"}
-                </span>
-              </div>
-              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
                 <span className="w-1/4 font-semibold"> التخصص</span>
                 <span className="w-3/4 font-light">
                   {profile?.data.specialization || "----"}
                 </span>
               </div>
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
-                <span className="w-1/4 font-semibold"> المكتب</span>
-                <span className="w-3/4 font-light">
-                  {profile?.data.office || "----"}
-                </span>
-              </div>
-              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
                 <span className="w-1/4 font-semibold"> الوظيفة</span>
                 <span className="w-3/4 font-light">
                   {profile?.data.role || "----"}
-                </span>
-              </div>
-              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
-                <span className="w-1/4 font-semibold"> الفرع</span>
-                <span className="w-3/4 font-light">
-                  {profile?.data.branchId || "----"}
                 </span>
               </div>
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
