@@ -36,8 +36,10 @@ export default function AddUser() {
       QueryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (error) => {
-      console.error("Error:", error.response.data.message);
-      toast.error("حدث خطاء اثناء اضافة المستخدم");
+      console.error("Error:", error);
+      toast.error(
+        error.response.data.message || "حدث خطاء اثناء اضافة المستخدم"
+      );
     },
   });
 
@@ -86,7 +88,11 @@ export default function AddUser() {
             <Input
               label="التخصص"
               {...register("specialization", { required: "اسم الشركة مطلوب" })}
-              type="text"
+              type="select"
+              options={[
+                { label: "مدني", value: "CIVILIAN" },
+                { label: "عسكري", value: "MILITARY" },
+              ]}
               error={errors.specialization}
             />
           </div>
@@ -142,32 +148,32 @@ export default function AddUser() {
               type="select"
               error={errors.role}
               options={[
-                { value: "super_admin", label: "مدير النظام" },
-                { value: "admin", label: "مدير" },
-                { value: "engineer", label: "مهندس" },
-                { value: "user", label: "مستخدم" },
+                { value: "USER", label: "مستخدم" },
+                { value: "SUPER_ADMIN", label: "مدير النظام" },
               ]}
               rules={{ required: "الوظيفة مطلوبة" }}
             />
           </div>
-          <div className="col-span-full">
-            <label className="block text-sm font-medium mb-1">
-              الوحدة التابع لها
-            </label>
+          {watch("role") === "USER" && (
+            <div className="col-span-full">
+              <label className="block text-sm font-medium mb-1">
+                الوحدة التابع لها
+              </label>
 
-            <div
-              onClick={() => setIsUnitModalOpen(true)}
-              className="border rounded px-3 py-2 cursor-pointer bg-gray-50 hover:bg-gray-100"
-            >
-              {selectedUnit?.name || "اختر الوحدة التابع لها"}
+              <div
+                onClick={() => setIsUnitModalOpen(true)}
+                className="border rounded px-3 py-2 cursor-pointer bg-gray-50 hover:bg-gray-100"
+              >
+                {selectedUnit?.name || "اختر الوحدة التابع لها"}
+              </div>
+
+              {errors.organizationalUnit && (
+                <p className="text-red-500 text-sm mt-1">
+                  الوحدة التابع لها مطلوبة
+                </p>
+              )}
             </div>
-
-            {errors.organizationalUnit && (
-              <p className="text-red-500 text-sm mt-1">
-                الوحدة التابع لها مطلوبة
-              </p>
-            )}
-          </div>
+          )}
           <div className="col-span-full">
             <Button
               type="submit"
@@ -182,10 +188,12 @@ export default function AddUser() {
           isOpen={isUnitModalOpen}
           onClose={() => setIsUnitModalOpen(false)}
           onSelect={(unit) => {
-            setValue("organizationalUnit", unit, {
+            console.log("unit", unit[0]);
+            setValue("organizationalUnit", unit[0], {
               shouldValidate: true,
             });
           }}
+          multiple={false}
         />
       </section>
     </>

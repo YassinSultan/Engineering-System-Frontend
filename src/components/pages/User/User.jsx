@@ -210,7 +210,9 @@ export default function User() {
       cell: ({ row }) => (
         <div className="flex flex-col text-end gap-2">
           {row.original.permissions.map((p) => (
-            <span className="font-mono text-xs px-2 py-1 rounded">{p}</span>
+            <span className="font-mono text-xs px-2 py-1 rounded">
+              {p.action}
+            </span>
           ))}
         </div>
       ),

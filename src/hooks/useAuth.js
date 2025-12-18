@@ -9,7 +9,7 @@ export const useAuth = () => {
     const hasPermission = (permission) => {
         console.log("profile", profile);
         console.log("claims", claims);
-        if (claims?.role === "super_admin") return true;
+        if (claims?.role === "SUPER_ADMIN") return true;
         return claims?.permissions?.includes(permission) || false;
     };
 

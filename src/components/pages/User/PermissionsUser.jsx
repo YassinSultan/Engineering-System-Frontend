@@ -4,13 +4,13 @@ import { useParams } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getUser, updateUserPermissions } from "../../../api/userAPI";
 import Loading from "../../common/Loading/Loading";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import Button from "../../ui/Button/Button";
 import { BiChevronDown, BiChevronLeft } from "react-icons/bi";
 import toast from "react-hot-toast";
+import OrganizationalTreeModal from "../../common/OrganizationalTreeModal/OrganizationalTreeModal";
 
 export default function PermissionsUser() {
-  // هيكل الصلاحيات
   const permissionGroups = [
     {
       id: "users",
@@ -49,11 +49,13 @@ export default function PermissionsUser() {
         { name: "read", label: "عرض الشركات" },
       ],
     },
+    // أضف مجموعات أخرى حسب الحاجة
   ];
+
   const { id } = useParams();
   const {
-    data: user,
-    isLoading,
+    data: userData,
+    isLoading: userLoading,
     isError,
   } = useQuery({
     queryKey: ["user", id],
@@ -61,131 +63,103 @@ export default function PermissionsUser() {
     enabled: !!id,
   });
 
-  // حالة الفتح/الإغلاق لكل مجموعة بشكل مستقل
-  const [openGroups, setOpenGroups] = useState(() => {
-    const initialOpen = {};
-    permissionGroups.forEach((group) => {
-      initialOpen[group.id] = true; // مفتوحة افتراضيًا
-    });
-    return initialOpen;
+  const user = userData?.data;
+
+  const { handleSubmit, setValue, watch, reset } = useForm({
+    defaultValues: { permissions: [] },
   });
 
-  const { control, handleSubmit, setValue, reset } = useForm({
-    defaultValues: {
-      permissions: [],
-    },
-  });
+  const permissions = watch("permissions") || [];
 
-  const selectedPermissions = useWatch({
-    control,
-    name: "permissions",
-    defaultValue: [],
-  });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentEditingPerm, setCurrentEditingPerm] = useState(null); // { action }
 
-  const toggleGroupOpen = (groupId) => {
-    setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
-  };
+  // تحميل الصلاحيات عند جلب المستخدم
+  useEffect(() => {
+    if (user?.permissions) {
+      reset({ permissions: user.permissions });
+    }
+  }, [user, reset]);
 
-  const normalizePermissions = (perms) => {
-    const normalized = new Set(perms);
+  // دالة لإضافة أو تحديث صلاحية
+  const upsertPermission = (action, scope, units = []) => {
+    const newPerms = permissions.filter((p) => p.action !== action);
 
+    if (scope !== null) {
+      newPerms.push({
+        action,
+        scope: scope || "ALL",
+        units: scope === "CUSTOM_UNITS" ? units : [],
+      });
+    }
+
+    // إضافة :read تلقائيًا إذا كان هناك create/update/delete
+    const actions = newPerms.map((p) => p.action);
     permissionGroups.forEach((group) => {
       const base = group.prefix;
-
-      const hasUpdate =
-        normalized.has(`${base}update`) ||
-        Array.from(normalized).some((p) => p.startsWith(`${base}update:`));
-
-      const hasDelete =
-        normalized.has(`${base}delete`) ||
-        Array.from(normalized).some((p) => p.startsWith(`${base}delete:`));
-
-      if (hasUpdate || hasDelete) {
-        normalized.add(`${base}read`);
+      const hasWrite = ["create", "update", "delete"].some((act) =>
+        actions.some(
+          (a) => a === `${base}${act}` || a.startsWith(`${base}${act}:`)
+        )
+      );
+      if (hasWrite) {
+        const readAction = `${base}read`;
+        if (!actions.includes(readAction)) {
+          newPerms.push({ action: readAction, scope: "ALL", units: [] });
+        }
       }
     });
 
-    return Array.from(normalized);
-  };
-  // تحديد/إلغاء كل صلاحيات المجموعة
-  const toggleGroup = (groupPrefix) => {
-    const groupPerms = permissionGroups
-      .find((g) => g.prefix === groupPrefix)
-      .permissions.flatMap((p) =>
-        p.subPermissions
-          ? p.subPermissions.map((sp) => `${groupPrefix}${p.name}:${sp.name}`)
-          : [`${groupPrefix}${p.name}`]
-      );
-
-    const allSelected = groupPerms.every((p) =>
-      selectedPermissions.includes(p)
-    );
-
-    if (allSelected) {
-      setValue(
-        "permissions",
-        normalizePermissions(
-          selectedPermissions.filter((p) => !groupPerms.includes(p))
-        )
-      );
-    } else {
-      setValue(
-        "permissions",
-        normalizePermissions([
-          ...selectedPermissions.filter((p) => !groupPerms.includes(p)),
-          ...groupPerms.filter((p) => !selectedPermissions.includes(p)),
-        ])
-      );
-    }
+    setValue("permissions", newPerms);
   };
 
-  // تحديد/إلغاء صلاحية رئيسية (مثل update)
-  const toggleMainPermission = (groupPrefix, permName, subPerms = []) => {
-    const perms = subPerms.length
-      ? subPerms.map((sp) => `${groupPrefix}${permName}:${sp.name}`)
-      : [`${groupPrefix}${permName}`];
-
-    const allSelected = perms.every((p) => selectedPermissions.includes(p));
-
-    if (allSelected) {
-      setValue(
-        "permissions",
-        normalizePermissions(
-          selectedPermissions.filter((p) => !perms.includes(p))
-        )
-      );
-    } else {
-      setValue(
-        "permissions",
-        normalizePermissions([...new Set([...selectedPermissions, ...perms])])
-      );
-    }
+  // جلب الصلاحية الحالية لعرض الـ scope
+  const getCurrentScope = (action) => {
+    const perm = permissions.find((p) => p.action === action);
+    return perm ? perm.scope : null;
   };
-  useEffect(() => {
-    if (user?.data?.permissions) {
-      reset({
-        permissions: user.data.permissions,
-      });
-    }
-  }, [user, reset]);
-  const mutaation = useMutation({
-    mutationKey: ["update-user-permissions", id],
+
+  const getCurrentUnits = (action) => {
+    const perm = permissions.find((p) => p.action === action);
+    return perm?.units || [];
+  };
+
+  const getUnitNames = (unitIds) => {
+    // لو عايز تعرض أسماء الوحدات، هنجيبها من الشجرة لاحقًا
+    // دلوقتي هنعرض عدد بس
+    return unitIds.length > 0
+      ? `${unitIds.length} وحدة مختارة`
+      : "لا توجد وحدات";
+  };
+
+  const mutation = useMutation({
     mutationFn: (data) => updateUserPermissions({ id, data }),
     onSuccess: () => {
       toast.success("تم تحديث صلاحيات المستخدم بنجاح");
     },
     onError: (error) => {
-      toast.error("حدث خطاء اثناء تحديث صلاحيات المستخدم");
-      console.log("error", error);
+      console.log(error);
+      toast.error(error?.response?.data?.message || "حدث خطأ أثناء التحديث");
     },
   });
+
   const onSubmit = (data) => {
-    const safePermissions = normalizePermissions(data.permissions);
-    console.log(safePermissions);
-    mutaation.mutate({ permissions: safePermissions });
+    // تنظيف الـ units الفاضية
+    const cleanPermissions = data.permissions.map((p) => ({
+      action: p.action,
+      scope: p.scope,
+      units: p.scope === "CUSTOM_UNITS" ? p.units : [],
+    }));
+    console.log("cleanPermissions", cleanPermissions);
+    mutation.mutate({ permissions: cleanPermissions });
   };
 
-  if (isLoading) return <Loading />;
+  const openUnitsModal = (action) => {
+    setCurrentEditingPerm(action);
+    setModalOpen(true);
+  };
+
+  if (userLoading) return <Loading />;
   if (isError)
     return (
       <div className="text-red-600 text-center py-10">
@@ -194,199 +168,287 @@ export default function PermissionsUser() {
     );
 
   return (
-    <section className="mx-auto space-y-8 py-6" dir="rtl">
-      <div className="w-fit">
-        <PageTitle
-          title="صلاحيات المستخدم"
-          subTitle={`${user?.data?.fullName} - ${user?.data?.username}`}
-        />
-      </div>
+    <>
+      <section className="mx-auto space-y-8 py-6" dir="rtl">
+        <div className="w-fit">
+          <PageTitle
+            title="صلاحيات المستخدم"
+            subTitle={`${user?.fullNameArabic || user?.fullNameEnglish} - ${
+              user?.username
+            }`}
+          />
+        </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="bg-background rounded-2xl shadow-lg border border-base overflow-hidden">
-          <div className="p-6 bg-base">
-            <h2 className="text-2xl font-bold ">إدارة صلاحيات المستخدم</h2>
-            <p className="mt-1">حدد الصلاحيات التي يمكن للمستخدم تنفيذها</p>
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <div className="bg-background rounded-2xl shadow-lg border border-base overflow-hidden">
+            <div className="p-6 bg-base">
+              <h2 className="text-2xl font-bold">إدارة صلاحيات المستخدم</h2>
+              <p className="mt-1">حدد الصلاحيات والنطاق لكل عملية</p>
+            </div>
 
-          <div className="p-6 space-y-6 grid grid-cols-1">
-            {permissionGroups.map((group) => {
-              const groupPrefix = group.prefix;
-              const allGroupPerms = group.permissions.flatMap((p) =>
-                p.subPermissions
-                  ? p.subPermissions.map(
-                      (sp) => `${groupPrefix}${p.name}:${sp.name}`
-                    )
-                  : [`${groupPrefix}${p.name}`]
-              );
-
-              const groupSelectedCount = allGroupPerms.filter((p) =>
-                selectedPermissions.includes(p)
-              ).length;
-
-              const isGroupIndeterminate =
-                groupSelectedCount > 0 &&
-                groupSelectedCount < allGroupPerms.length;
-
-              const isOpen = openGroups[group.id] ?? true;
-
-              return (
+            <div className="p-6 space-y-8">
+              {permissionGroups.map((group) => (
                 <div
                   key={group.id}
-                  className="border border-gray-300 rounded-xl overflow-hidden bg-background shadow-sm hover:shadow-md transition-shadow"
+                  className="border border-gray-300 rounded-xl overflow-hidden bg-background shadow-sm"
                 >
-                  {/* رأس المجموعة */}
-                  <div
-                    className="flex items-center gap-4 p-5 bg-base cursor-pointer select-none"
-                    onClick={() => toggleGroupOpen(group.id)}
-                  >
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleGroupOpen(group.id);
-                      }}
-                      className=" transition"
-                    >
-                      {isOpen ? (
-                        <BiChevronDown className="w-6 h-6" />
-                      ) : (
-                        <BiChevronLeft className="w-6 h-6" />
-                      )}
-                    </button>
-
-                    <input
-                      type="checkbox"
-                      checked={groupSelectedCount === allGroupPerms.length}
-                      ref={(el) =>
-                        el && (el.indeterminate = isGroupIndeterminate)
-                      }
-                      onChange={() => toggleGroup(groupPrefix)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-5 h-5 rounded border-gray-400 focus:ring-blue-500 cursor-pointer"
-                    />
-
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold">{group.label}</h3>
-                      <p className="text-sm ">
-                        تم اختيار {groupSelectedCount} من {allGroupPerms.length}{" "}
-                        صلاحية
-                      </p>
-                    </div>
+                  <div className="p-5 bg-base">
+                    <h3 className="text-xl font-semibold">{group.label}</h3>
                   </div>
 
-                  {/* قائمة الصلاحيات */}
-                  {isOpen && (
-                    <div className="p-6 space-y-5 border-t border-gray-200 bg-gray-50/30">
-                      {group.permissions.map((perm) => {
-                        const fullPerm = `${groupPrefix}${perm.name}`;
-                        const hasSub =
-                          perm.subPermissions && perm.subPermissions.length > 0;
-                        const subPerms = hasSub
-                          ? perm.subPermissions.map(
-                              (sp) => `${fullPerm}:${sp.name}`
-                            )
-                          : [];
+                  <div className="p-6 space-y-6">
+                    {group.permissions.map((perm) => {
+                      const actionBase = `${group.prefix}${perm.name}`;
+                      const subActions = perm.subPermissions
+                        ? perm.subPermissions.map(
+                            (sp) => `${actionBase}:${sp.name}`
+                          )
+                        : [actionBase];
 
-                        const mainChecked = hasSub
-                          ? subPerms.every((p) =>
-                              selectedPermissions.includes(p)
-                            )
-                          : selectedPermissions.includes(fullPerm);
+                      // نعتبر الصلاحية الرئيسية مفعلة لو أي sub مفعلة
+                      const isEnabled = subActions.some((act) =>
+                        permissions.some((p) => p.action === act)
+                      );
 
-                        const mainIndeterminate =
-                          hasSub &&
-                          subPerms.some((p) =>
-                            selectedPermissions.includes(p)
-                          ) &&
-                          !mainChecked;
-
-                        return (
-                          <div
-                            key={perm.name}
-                            className="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
-                          >
-                            {/* الصلاحية الرئيسية */}
-                            <div className="flex items-center gap-3">
-                              <input
-                                type="checkbox"
-                                checked={mainChecked}
-                                ref={(el) =>
-                                  el && (el.indeterminate = mainIndeterminate)
-                                }
-                                onChange={() =>
-                                  toggleMainPermission(
-                                    groupPrefix,
-                                    perm.name,
-                                    perm.subPermissions || []
-                                  )
-                                }
-                                className="w-5 h-5 text-blue-600 rounded border-gray-400 focus:ring-blue-500"
-                              />
-                              <span className="font-medium text-gray-800">
-                                {perm.label}
-                              </span>
-                            </div>
-
-                            {/* الصلاحيات الفرعية */}
-                            {hasSub && (
-                              <div className="mt-4 pr-10 space-y-3 border-r-4 border-blue-200">
-                                {perm.subPermissions.map((sub) => {
-                                  const subFull = `${fullPerm}:${sub.name}`;
-                                  return (
-                                    <label
-                                      key={sub.name}
-                                      className="flex items-center gap-3 py-2 hover:bg-blue-50 rounded-lg px-3 transition cursor-pointer"
-                                    >
-                                      <Controller
-                                        name="permissions"
-                                        control={control}
-                                        render={({ field }) => (
-                                          <input
-                                            type="checkbox"
-                                            checked={
-                                              field.value?.includes(subFull) ||
-                                              false
-                                            }
-                                            onChange={(e) => {
-                                              const newPerms = e.target.checked
-                                                ? [...field.value, subFull]
-                                                : field.value.filter(
-                                                    (p) => p !== subFull
-                                                  );
-                                              field.onChange(
-                                                normalizePermissions(newPerms)
-                                              );
-                                            }}
-                                            className="w-4 h-4 text-blue-600 rounded border-gray-400 focus:ring-blue-500"
-                                          />
-                                        )}
-                                      />
-                                      <span className="text-gray-700">
-                                        {sub.label}
-                                      </span>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            )}
+                      return (
+                        <div
+                          key={perm.name}
+                          className={`p-5 rounded-lg border ${
+                            isEnabled
+                              ? "bg-blue-50 border-blue-300"
+                              : "bg-gray-50 border-gray-300"
+                          }`}
+                        >
+                          <div className="font-medium text-lg mb-4">
+                            {perm.label}
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
-        <div className="flex">
-          <Button type="submit" className="px-12 py-3 text-lg">
-            حفظ الصلاحيات
-          </Button>
-        </div>
-      </form>
-    </section>
+                          {perm.subPermissions ? (
+                            // عرض الصلاحيات الفرعية
+                            <div className="space-y-3 pr-8">
+                              {perm.subPermissions.map((sub) => {
+                                const subAction = `${actionBase}:${sub.name}`;
+                                const scope = getCurrentScope(subAction);
+
+                                return (
+                                  <div key={sub.name} className="space-y-2">
+                                    <label className="flex items-center gap-3">
+                                      <input
+                                        type="checkbox"
+                                        checked={!!scope}
+                                        onChange={(e) =>
+                                          upsertPermission(
+                                            subAction,
+                                            e.target.checked ? "ALL" : null
+                                          )
+                                        }
+                                        className="w-5 h-5 text-blue-600 rounded"
+                                      />
+                                      <span>{sub.label}</span>
+                                    </label>
+
+                                    {scope && (
+                                      <div className="pr-10 space-y-3">
+                                        <div className="flex items-center gap-6">
+                                          <label className="flex items-center gap-2">
+                                            <input
+                                              type="radio"
+                                              name={`scope-${subAction}`}
+                                              checked={scope === "ALL"}
+                                              onChange={() =>
+                                                upsertPermission(
+                                                  subAction,
+                                                  "ALL"
+                                                )
+                                              }
+                                            />
+                                            <span>كل الوحدات</span>
+                                          </label>
+
+                                          <label className="flex items-center gap-2">
+                                            <input
+                                              type="radio"
+                                              name={`scope-${subAction}`}
+                                              checked={scope === "OWN_UNIT"}
+                                              onChange={() =>
+                                                upsertPermission(
+                                                  subAction,
+                                                  "OWN_UNIT"
+                                                )
+                                              }
+                                            />
+                                            <span>الوحدة الخاصة به فقط</span>
+                                          </label>
+
+                                          <label className="flex items-center gap-2">
+                                            <input
+                                              type="radio"
+                                              name={`scope-${subAction}`}
+                                              checked={scope === "CUSTOM_UNITS"}
+                                              onChange={() =>
+                                                upsertPermission(
+                                                  subAction,
+                                                  "CUSTOM_UNITS",
+                                                  getCurrentUnits(subAction)
+                                                )
+                                              }
+                                            />
+                                            <span>وحدات محددة</span>
+                                          </label>
+                                        </div>
+
+                                        {scope === "CUSTOM_UNITS" && (
+                                          <div className="flex items-center gap-3">
+                                            <span className="text-sm text-gray-600">
+                                              {getUnitNames(
+                                                getCurrentUnits(subAction)
+                                              )}
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                openUnitsModal(subAction)
+                                              }
+                                              className="text-primary-600 hover:underline text-sm"
+                                            >
+                                              تعديل الوحدات
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            // صلاحية بدون sub
+                            <div className="space-y-3">
+                              <label className="flex items-center gap-3">
+                                <input
+                                  type="checkbox"
+                                  checked={!!getCurrentScope(actionBase)}
+                                  onChange={(e) =>
+                                    upsertPermission(
+                                      actionBase,
+                                      e.target.checked ? "ALL" : null
+                                    )
+                                  }
+                                  className="w-5 h-5 text-blue-600 rounded"
+                                />
+                                <span>تفعيل هذه الصلاحية</span>
+                              </label>
+
+                              {getCurrentScope(actionBase) && (
+                                <div className="pr-8 space-y-3">
+                                  <div className="flex items-center gap-6">
+                                    <label className="flex items-center gap-2">
+                                      <input
+                                        type="radio"
+                                        name={`scope-${actionBase}`}
+                                        checked={
+                                          getCurrentScope(actionBase) === "ALL"
+                                        }
+                                        onChange={() =>
+                                          upsertPermission(actionBase, "ALL")
+                                        }
+                                      />
+                                      <span>كل الوحدات</span>
+                                    </label>
+                                    <label className="flex items-center gap-2">
+                                      <input
+                                        type="radio"
+                                        name={`scope-${actionBase}`}
+                                        checked={
+                                          getCurrentScope(actionBase) ===
+                                          "OWN_UNIT"
+                                        }
+                                        onChange={() =>
+                                          upsertPermission(
+                                            actionBase,
+                                            "OWN_UNIT"
+                                          )
+                                        }
+                                      />
+                                      <span>الوحدة الخاصة به فقط</span>
+                                    </label>
+                                    <label className="flex items-center gap-2">
+                                      <input
+                                        type="radio"
+                                        name={`scope-${actionBase}`}
+                                        checked={
+                                          getCurrentScope(actionBase) ===
+                                          "CUSTOM_UNITS"
+                                        }
+                                        onChange={() =>
+                                          upsertPermission(
+                                            actionBase,
+                                            "CUSTOM_UNITS",
+                                            getCurrentUnits(actionBase)
+                                          )
+                                        }
+                                      />
+                                      <span>وحدات محددة</span>
+                                    </label>
+                                  </div>
+
+                                  {getCurrentScope(actionBase) ===
+                                    "CUSTOM_UNITS" && (
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-sm text-gray-600">
+                                        {getUnitNames(
+                                          getCurrentUnits(actionBase)
+                                        )}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          openUnitsModal(actionBase)
+                                        }
+                                        className="text-primary-600 hover:underline text-sm"
+                                      >
+                                        تعديل الوحدات
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              isLoading={mutation.isPending}
+              className="px-12 py-3 text-lg"
+            >
+              حفظ الصلاحيات
+            </Button>
+          </div>
+        </form>
+      </section>
+
+      {/* Modal لاختيار الوحدات */}
+      <OrganizationalTreeModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setCurrentEditingPerm(null);
+        }}
+        onSelect={(selectedNodes) => {
+          const unitIds = selectedNodes.map((node) => node._id);
+          upsertPermission(currentEditingPerm, "CUSTOM_UNITS", unitIds);
+        }}
+        multiple={true} // مهم جدًا
+      />
+    </>
   );
 }

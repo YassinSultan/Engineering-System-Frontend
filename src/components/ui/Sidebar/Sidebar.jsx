@@ -178,7 +178,7 @@ export default function Sidebar() {
           {menu.map((item) => renderMenuItem(item))}
         </div>
         {/* ادارة الوحدات */}
-        {profile?.data?.role === "super_admin" && (
+        {profile?.data?.role === "SUPER_ADMIN" && (
           <NavLink
             to="/organization-units"
             end

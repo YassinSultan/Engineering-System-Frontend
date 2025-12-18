@@ -41,13 +41,16 @@ export default function OrganizationUnits() {
         </div>
         <div class="mt-4">
           <label for="type" class="block mb-2.5 text-sm font-medium text-heading text-start">نوع الوحدة</label>
-          <select id="type" class="block w-full px-3 py-2.5 bg-white border text-heading text-sm rounded-lg focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
-                  <option value="">اختر النوع</option>
-                  <option value="ADMINISTRATION">إدارة</option>
-                  <option value="BRANCH">فرع</option>
-                  <option value="OFFICE">مكتب</option>
-                  <option value="MAIN_UNIT">وحدة رئيسية</option>
-                  <option value="SUB_UNIT">وحدة فرعية</option>
+          <select ${
+            !parent ? "disabled" : ""
+          } id="type" class="block w-full px-3 py-2.5 bg-white border text-heading text-sm rounded-lg focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
+            <option value="">اختر النوع</option>
+            ${
+              !parent
+                ? '<option value="MAIN_UNIT" selected>وحدة رئيسية</option>'
+                : '<option value="SUB_UNIT" selected>وحدة فرعية</option>'
+            }
+             <option value="DEPARTMENT">قسم</option>
           </select>
         </div>
       `,
@@ -103,23 +106,19 @@ export default function OrganizationUnits() {
         </div>
         <div class="mt-4">
           <label for="type" class="block mb-2.5 text-sm font-medium text-heading text-start">نوع الوحدة</label>
-          <select id="type" class="block w-full px-3 py-2.5 bg-white border text-heading text-sm rounded-lg focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
+          <select ${
+            selectedUnit.type === "MAIN_UNIT" ? "disabled" : ""
+          } id="type" class="block w-full px-3 py-2.5 bg-white border text-heading text-sm rounded-lg focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
                   <option value="">اختر النوع</option>
-                  <option value="ADMINISTRATION" ${
-                    selectedUnit.type === "ADMINISTRATION" ? "selected" : ""
-                  }>إدارة</option>
-                  <option value="BRANCH" ${
-                    selectedUnit.type === "BRANCH" ? "selected" : ""
-                  }>فرع</option>
-                  <option value="OFFICE" ${
-                    selectedUnit.type === "OFFICE" ? "selected" : ""
-                  }>مكتب</option>
                   <option value="MAIN_UNIT" ${
                     selectedUnit.type === "MAIN_UNIT" ? "selected" : ""
                   }>وحدة رئيسية</option>
                   <option value="SUB_UNIT" ${
                     selectedUnit.type === "SUB_UNIT" ? "selected" : ""
                   }>وحدة فرعية</option>
+                  <option value="SUB_UNIT" ${
+                    selectedUnit.type === "DEPARTMENT" ? "selected" : ""
+                  }>قسم</option>
           </select>
         </div>
       `,
@@ -148,7 +147,7 @@ export default function OrganizationUnits() {
 
       Swal.fire("تم", "تم تعديل الوحدة بنجاح", "success");
       refetch(); // Refresh the tree
-      setSelectedUnit(null); // Optional: clear selection or refetch details
+      setSelectedUnit(null);
     } catch (error) {
       console.error(error);
       Swal.fire(
@@ -231,7 +230,7 @@ export default function OrganizationUnits() {
                     <span className="font-semibold pe-2">
                       عدد الوحدات التابعة لها:
                     </span>
-                    <span>{selectedUnit?.children.length || "لا يوجد"}</span>
+                    <span>{selectedUnit?.children?.length || "لا يوجد"}</span>
                   </div>
                 </div>
                 {/* actions */}

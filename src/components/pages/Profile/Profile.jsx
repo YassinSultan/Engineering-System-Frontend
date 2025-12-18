@@ -37,7 +37,7 @@ export default function Profile() {
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
                 <span className="w-1/4 font-semibold">الوحدة التابع لها</span>
                 <span className="w-3/4 font-light">
-                  {profile?.data.organizationalUnit.name || "----"}
+                  {profile?.data?.organizationalUnit?.name || "----"}
                 </span>
               </div>
               <div className="w-full flex py-4 px-2 border-b border-b-current last:border-b-0">
