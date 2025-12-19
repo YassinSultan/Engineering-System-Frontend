@@ -1,27 +1,15 @@
 // src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
 import api from "../../api/axiosInstance";
-
-
-// دالة لفك التوكن
-const decodeToken = (token) => {
-    try {
-        return jwtDecode(token);
-    } catch (err) {
-        console.log(err);
-        localStorage.removeItem("token");
-        return null;
-    }
-};
+import { normalizePermissions } from "../../utils/permission.utils"; // Import the utility
 
 // جلب بيانات المستخدم الكاملة
 export const fetchUserProfile = createAsyncThunk(
     "auth/fetchUserProfile",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get("auth/me"); // أو /users/me
-            return response.data; // { name: "أحمد محمد", email: "...", avatar: "...", ... }
+            const res = await api.get("/auth/me");
+            return res.data.data; // user object
         } catch (err) {
             return rejectWithValue(err.response?.data);
         }
@@ -29,10 +17,10 @@ export const fetchUserProfile = createAsyncThunk(
 );
 
 const initialState = {
-    token: localStorage.getItem("token") || null,
-    claims: decodeToken(localStorage.getItem("token")), // role + permissions + id
-    profile: null,        // الداتا الكاملة: name, avatar, email ...
+    token: localStorage.getItem("token"),
+    user: null,        // كل بيانات المستخدم + permissions
     loading: false,
+    initialized: false, // مهم جدًا
     error: null,
 };
 
@@ -44,35 +32,39 @@ const authSlice = createSlice({
             const { token } = action.payload;
             localStorage.setItem("token", token);
             state.token = token;
-            state.claims = decodeToken(token);
-            state.profile = null; // نعيد تحميل الـ profile
+            state.user = null;
+            state.initialized = false;
         },
         logout: (state) => {
             localStorage.removeItem("token");
             state.token = null;
-            state.claims = null;
-            state.profile = null;
+            state.user = null;
+            state.initialized = true;
         },
     },
     extraReducers: (builder) => {
         builder
             .addCase(fetchUserProfile.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(fetchUserProfile.fulfilled, (state, action) => {
                 state.loading = false;
-                state.profile = action.payload;
-                state.profile.data.avatar = `https://ui-avatars.com/api/?name=${action.payload?.data.fullNameEnglish}&background=random&rounded=true&size=50`;
+                const userData = action.payload;
+                state.user = {
+                    ...userData,
+                    permissions: normalizePermissions(userData.permissions), // Normalize permissions here
+                };
+                state.initialized = true;
             })
             .addCase(fetchUserProfile.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload?.message || "فشل تحميل بيانات المستخدم";
-                // لو التوكن منتهي → logout تلقائي
+                state.error = action.payload?.message;
+                state.initialized = true;
+
                 if (action.payload?.status === 401) {
                     localStorage.removeItem("token");
                     state.token = null;
-                    state.claims = null;
+                    state.user = null;
                 }
             });
     },

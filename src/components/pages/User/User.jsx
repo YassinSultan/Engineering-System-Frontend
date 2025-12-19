@@ -209,8 +209,8 @@ export default function User() {
       accessorKey: "permissions",
       cell: ({ row }) => (
         <div className="flex flex-col text-end gap-2">
-          {row.original.permissions.map((p) => (
-            <span className="font-mono text-xs px-2 py-1 rounded">
+          {row.original.permissions.map((p, index) => (
+            <span key={index} className="font-mono text-xs px-2 py-1 rounded">
               {p.action}
             </span>
           ))}

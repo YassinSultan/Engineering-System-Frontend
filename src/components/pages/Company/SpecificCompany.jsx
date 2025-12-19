@@ -6,7 +6,7 @@ import Loading from "../../common/Loading/Loading";
 import toast from "react-hot-toast";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Button from "../../ui/Button/Button";
-import getFileUrl from "../../../lib/getDownladLink";
+import getFileUrl from "../../../utils/getDownladLink";
 import { BsDownload } from "react-icons/bs";
 
 export default function SpecificCompany() {

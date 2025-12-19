@@ -9,7 +9,7 @@ import {
 } from "../../../api/organizationUnitsAPI";
 import Loading from "../../common/Loading/Loading";
 import OrganizationalTree from "../../ui/OrganizationalTree/OrganizationalTree";
-import formatDate from "../../../lib/formatDate";
+import formatDate from "../../../utils/formatDate";
 import Button from "../../ui/Button/Button";
 import { BiPlus } from "react-icons/bi";
 import Swal from "sweetalert2";

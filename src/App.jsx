@@ -8,7 +8,7 @@ import Company from "./components/pages/Company/Company";
 import AddCompany from "./components/pages/Company/AddCompany";
 import UpdateCompany from "./components/pages/Company/UpdateCompany";
 import NotFound from "./components/pages/NotFound/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/common/ProtectedRoute/ProtectedRoute";
 import { Provider } from "react-redux";
 import store from "./app/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -87,31 +87,31 @@ const router = createBrowserRouter([
       {
         path: "company",
         element: (
-          <ProtectedRoute requirePermission="companies:read">
+          <ProtectedRoute requirePermissions={["companies:read"]}>
             <Company />
           </ProtectedRoute>
         ),
       },
       {
-        path: "company/new",
+        path: "company/create",
         element: (
-          <ProtectedRoute requirePermission="companies:create">
+          <ProtectedRoute requirePermissions={["companies:create"]}>
             <AddCompany />
           </ProtectedRoute>
         ),
       },
       {
-        path: "company/edit/:id",
+        path: "company/update/:id",
         element: (
-          <ProtectedRoute requirePermission="companies:update">
+          <ProtectedRoute requirePermissions={["companies:update"]}>
             <UpdateCompany />
           </ProtectedRoute>
         ),
       },
       {
-        path: "/company/view/:id",
+        path: "/company/read/:id",
         element: (
-          <ProtectedRoute requirePermission="companies:update">
+          <ProtectedRoute requirePermissions={["companies:read"]}>
             <SpecificCompany />
           </ProtectedRoute>
         ),
@@ -119,7 +119,7 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: (
-          <ProtectedRoute requirePermission="users:read">
+          <ProtectedRoute requirePermissions="users:read">
             <User />
           </ProtectedRoute>
         ),
@@ -127,7 +127,7 @@ const router = createBrowserRouter([
       {
         path: "users/new",
         element: (
-          <ProtectedRoute requirePermission="users:create">
+          <ProtectedRoute requirePermissions="users:create">
             <AddUser />
           </ProtectedRoute>
         ),
@@ -135,7 +135,7 @@ const router = createBrowserRouter([
       {
         path: "users/permissions/:id",
         element: (
-          <ProtectedRoute requirePermission="users:updatePermissions">
+          <ProtectedRoute requirePermissions="users:updatePermissions">
             <PermissionsUser />
           </ProtectedRoute>
         ),
@@ -143,13 +143,19 @@ const router = createBrowserRouter([
       {
         path: "users/edit/:id",
         element: (
-          <ProtectedRoute requirePermission="companies:update">
+          <ProtectedRoute requirePermissions="companies:update">
             <UpdateUser />
           </ProtectedRoute>
         ),
       },
-
-      { path: "forbidden", element: <Forbidden /> },
+      {
+        path: "forbidden",
+        element: (
+          <ProtectedRoute>
+            <Forbidden />
+          </ProtectedRoute>
+        ),
+      },
       { path: "*", element: <NotFound /> },
     ],
   },

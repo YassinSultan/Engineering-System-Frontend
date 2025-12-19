@@ -1,24 +1,22 @@
 // src/hooks/useAuth.js
 import { useSelector } from "react-redux";
+import { hasAnyPermission, hasPermission } from "../utils/permission.utils";
+
 
 export const useAuth = () => {
-    const { token, claims, profile, loading } = useSelector((state) => state.auth);
-
-    const user = profile || claims; // لو الـ profile لسه بيحمل → نستخدم claims
-
-    const hasPermission = (permission) => {
-        console.log("profile", profile);
-        console.log("claims", claims);
-        if (claims?.role === "SUPER_ADMIN") return true;
-        return claims?.permissions?.map((p) => p.action).includes(permission) || false;
-    };
+    const { token, user, loading, initialized, error } = useSelector(
+        (state) => state.auth
+    );
 
     return {
         token,
-        user,           // فيه name و avatar لو موجود
-        profile,        // الداتا الكاملة
-        claims,         // role + permissions
+        user,
         isLoading: loading,
-        hasPermission,
+        initialized,
+        error,
+        hasPermission: (action, resourceUnitId = null) =>
+            hasPermission(user, action, resourceUnitId),
+        hasAnyPermission: (permsArray, resourceUnitId = null) =>
+            hasAnyPermission(user, permsArray, resourceUnitId),
     };
 };

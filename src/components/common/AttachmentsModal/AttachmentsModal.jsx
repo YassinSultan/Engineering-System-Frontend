@@ -2,7 +2,7 @@ import React from "react";
 import { BsFileEarmarkText, BsDownload } from "react-icons/bs";
 import Button from "../../ui/Button/Button";
 import Modal from "../../ui/Modal/Modal";
-import getFileUrl from "../../../lib/getDownladLink";
+import getFileUrl from "../../../utils/getDownladLink";
 
 const AttachmentsModal = ({
   isOpen,
