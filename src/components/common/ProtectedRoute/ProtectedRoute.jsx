@@ -14,11 +14,6 @@ export default function ProtectedRoute({
   if (!initialized || isLoading) {
     return <Loading />;
   }
-  console.log("requirePermissions", requirePermissions);
-  console.log(
-    "hasAnyPermission",
-    !hasAnyPermission(requirePermissions, resourceUnitId)
-  );
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }

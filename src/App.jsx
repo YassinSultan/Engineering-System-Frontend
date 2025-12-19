@@ -85,7 +85,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "company",
+        path: "companies",
         element: (
           <ProtectedRoute requirePermissions={["companies:read"]}>
             <Company />
@@ -93,7 +93,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "company/create",
+        path: "companies/create",
         element: (
           <ProtectedRoute requirePermissions={["companies:create"]}>
             <AddCompany />
@@ -101,7 +101,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "company/update/:id",
+        path: "companies/update/:id",
         element: (
           <ProtectedRoute requirePermissions={["companies:update"]}>
             <UpdateCompany />
@@ -109,7 +109,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/company/read/:id",
+        path: "/companies/read/:id",
         element: (
           <ProtectedRoute requirePermissions={["companies:read"]}>
             <SpecificCompany />
@@ -125,7 +125,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "users/new",
+        path: "users/create",
         element: (
           <ProtectedRoute requirePermissions="users:create">
             <AddUser />
@@ -141,7 +141,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "users/edit/:id",
+        path: "users/update/:id",
         element: (
           <ProtectedRoute requirePermissions="companies:update">
             <UpdateUser />
@@ -156,7 +156,14 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: "*", element: <NotFound /> },
+      {
+        path: "*",
+        element: (
+          <ProtectedRoute>
+            <NotFound />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);

@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import Loading from "../../common/Loading/Loading";
 import AttachmentsModal from "../../common/AttachmentsModal/AttachmentsModal";
 import ColumnSelector from "../../common/ColumnSelector/ColumnSelector";
+import Can from "../../common/Can/Can";
 const fields = [
   {
     value: "companyCode",
@@ -149,6 +150,7 @@ export default function Company() {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
+      cancelButtonText: "الغاء",
       confirmButtonText: "حذف",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -365,22 +367,28 @@ export default function Company() {
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <NavLink to={`/company/view/${row.original._id}`}>
-            <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
-              <BsEye className="w-4 h-4" />
+          <Can action={"companies:read"}>
+            <NavLink to={`/companies/read/${row.original._id}`}>
+              <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+                <BsEye className="w-4 h-4" />
+              </button>
+            </NavLink>
+          </Can>
+          <Can action={"companies:update"}>
+            <NavLink to={`/companies/update/${row.original._id}`}>
+              <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
+                <BiEdit className="w-4 h-4" />
+              </button>
+            </NavLink>
+          </Can>
+          <Can action={"companies:delete"}>
+            <button
+              onClick={() => handelDelete(row.original._id)}
+              className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
+            >
+              <BsTrash2 className="w-4 h-4" />
             </button>
-          </NavLink>
-          <NavLink to={`/company/edit/${row.original._id}`}>
-            <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
-              <BiEdit className="w-4 h-4" />
-            </button>
-          </NavLink>
-          <button
-            onClick={() => handelDelete(row.original._id)}
-            className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
-          >
-            <BsTrash2 className="w-4 h-4" />
-          </button>
+          </Can>
         </div>
       ),
     },
@@ -402,9 +410,14 @@ export default function Company() {
           >
             {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
           </Button>
-          <Button onClick={() => navigate("/company/new")} icon={<FaPlus />}>
-            اضافة شركة
-          </Button>
+          <Can action="companies:create">
+            <Button
+              onClick={() => navigate("/companies/create")}
+              icon={<FaPlus />}
+            >
+              اضافة شركة
+            </Button>
+          </Can>
         </div>
       </div>
       <div className="flex items-center justify-between">

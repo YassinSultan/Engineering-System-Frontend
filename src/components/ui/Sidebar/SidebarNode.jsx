@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { hasAnyPermission } from "../../../utils/permission.utils";
 
 export default function SidebarNode({ node, isOpen, level = 0, user }) {
+  console.log("user", user);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const effectiveOpen = isOpen ? open : false;

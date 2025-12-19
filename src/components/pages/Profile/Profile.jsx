@@ -1,13 +1,20 @@
 import React from "react";
 import PageTitle from "../../ui/PageTitle/PageTitle";
-import { useSelector } from "react-redux";
 import Button from "../../ui/Button/Button";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "../../../api/profileApi";
+import Loading from "../../common/Loading/Loading";
 
 export default function Profile() {
-  const { profile } = useSelector((state) => state.auth);
-  console.log(profile);
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: getProfile,
+  });
   const navigate = useNavigate();
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <>
       <section>
@@ -71,7 +78,7 @@ export default function Profile() {
             <div>
               <img
                 src={profile?.data.avatar}
-                alt="user-name"
+                alt="profile"
                 width={100}
                 height={100}
               />

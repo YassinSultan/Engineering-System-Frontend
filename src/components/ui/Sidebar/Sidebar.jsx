@@ -36,7 +36,11 @@ const menu = [
     icon: <BiPackage className="size-5" />,
     path: "/users",
     children: [
-      { label: "إضافة مستخدم", path: "/new", permissions: ["users:create"] },
+      {
+        label: "إضافة مستخدم",
+        path: "/users/create",
+        permissions: ["users:create"],
+      },
       {
         label: "قائمة المستخدمين",
         path: "/users",

@@ -18,6 +18,7 @@ import { FiRefreshCcw } from "react-icons/fi";
 import DataTable from "../../common/DataTabel/DataTable";
 import { BsEye, BsTrash2 } from "react-icons/bs";
 import { BiEdit } from "react-icons/bi";
+import Can from "../../common/Can/Can";
 
 const fields = [
   {
@@ -223,27 +224,35 @@ export default function User() {
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <NavLink to={`/users/view/${row.original._id}`}>
-            <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
-              <BsEye className="w-4 h-4" />
+          <Can action="users:read">
+            <NavLink to={`/users/read/${row.original._id}`}>
+              <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+                <BsEye className="w-4 h-4" />
+              </button>
+            </NavLink>
+          </Can>
+          <Can action="users:update">
+            <NavLink to={`/users/update/${row.original._id}`}>
+              <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
+                <BiEdit className="w-4 h-4" />
+              </button>
+            </NavLink>
+          </Can>
+          <Can action="users:create">
+            <NavLink to={`/users/permissions/${row.original._id}`}>
+              <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
+                <FaKeycdn className="w-4 h-4" />
+              </button>
+            </NavLink>
+          </Can>
+          <Can action="users:delete">
+            <button
+              onClick={() => handelDelete(row.original._id)}
+              className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
+            >
+              <BsTrash2 className="w-4 h-4" />
             </button>
-          </NavLink>
-          <NavLink to={`/users/edit/${row.original._id}`}>
-            <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
-              <BiEdit className="w-4 h-4" />
-            </button>
-          </NavLink>
-          <NavLink to={`/users/permissions/${row.original._id}`}>
-            <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
-              <FaKeycdn className="w-4 h-4" />
-            </button>
-          </NavLink>
-          <button
-            onClick={() => handelDelete(row.original._id)}
-            className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
-          >
-            <BsTrash2 className="w-4 h-4" />
-          </button>
+          </Can>
         </div>
       ),
     },
@@ -257,17 +266,21 @@ export default function User() {
           subTitle="يمكنك التحكم في المستخدمين من هنا"
         />
         <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            icon={<FaDownload />}
-            onClick={() => excelMutation.mutate()} // ← لازم .mutate()
-            disabled={excelMutation.isPending} // ← loading state
-          >
-            {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
-          </Button>
-          <Button onClick={() => navigate("/users/new")} icon={<FaPlus />}>
-            اضافة مستخدم
-          </Button>
+          <Can action="users:read">
+            <Button
+              variant="secondary"
+              icon={<FaDownload />}
+              onClick={() => excelMutation.mutate()} // ← لازم .mutate()
+              disabled={excelMutation.isPending} // ← loading state
+            >
+              {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
+            </Button>
+          </Can>
+          <Can action="users:create">
+            <Button onClick={() => navigate("/users/create")} icon={<FaPlus />}>
+              اضافة مستخدم
+            </Button>
+          </Can>
         </div>
       </div>
       <div className="flex items-center justify-between">
