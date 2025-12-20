@@ -72,7 +72,8 @@ export default function User() {
       console.log(res);
       toast.success("تم جلب المستخدمين بنجاح");
     },
-    onError: () => {
+    onError: (error) => {
+      console.log(error);
       toast.error("حدث خطاء اثناء جلب المستخدمين");
     },
   });

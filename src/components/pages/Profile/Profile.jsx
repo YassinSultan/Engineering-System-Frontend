@@ -21,8 +21,8 @@ export default function Profile() {
         <div className="mb-4">
           <PageTitle title="الملف الشخصي" />
         </div>
-        <div className="grid grid-cols-4 gap-4">
-          <div className="bg-base w-full p-2 rounded-lg shadow-md col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 space-y-4 lg:gap-4">
+          <div className="bg-base w-full p-2 rounded-lg shadow-md col-span-3 ">
             <h3 className="text-xl">المعلومات الشخصية</h3>
             <div className="flex flex-col">
               <div className="w-full flex py-4 px-2 border-b last:border-b-0">
@@ -121,7 +121,8 @@ export default function Profile() {
                       <td className="px-6 py-4">{permission.action}</td>
                       <td className="px-6 py-4">{permission.scope}</td>
                       <td className="px-6 py-4">
-                        {permission.units.map((u) => u).join(", ") || "----"}
+                        {permission.units.map((u) => u.name).join(", ") ||
+                          "----"}
                       </td>
                     </tr>
                   ))}

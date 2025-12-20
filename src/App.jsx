@@ -135,7 +135,7 @@ const router = createBrowserRouter([
       {
         path: "users/permissions/:id",
         element: (
-          <ProtectedRoute requirePermissions="users:updatePermissions">
+          <ProtectedRoute requirePermissions="users:update:updatePermissions">
             <PermissionsUser />
           </ProtectedRoute>
         ),

@@ -10,12 +10,11 @@ export default function ProtectedRoute({
 }) {
   const { token, hasAnyPermission, isLoading, initialized } = useAuth();
   const location = useLocation();
-
-  if (!initialized || isLoading) {
-    return <Loading />;
-  }
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+  if (!initialized || isLoading) {
+    return <Loading />;
   }
 
   if (
