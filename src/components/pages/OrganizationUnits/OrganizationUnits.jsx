@@ -27,7 +27,6 @@ export default function OrganizationUnits() {
     queryFn: getUnitsTree,
     select: (res) => res.data,
   });
-  console.log(tree);
   if (isLoading) {
     return <Loading />;
   }

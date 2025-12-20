@@ -24,7 +24,6 @@ export default function Login() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      console.log(data.token);
       // الحل الأهم: dispatch التوكن للـ Redux
       dispatch(setCredentials({ token: data.token }));
 
@@ -34,6 +33,7 @@ export default function Login() {
       navigate(from, { replace: true });
     },
     onError: (error) => {
+      console.log(error);
       const message =
         error.response?.data?.message ||
         error.message ||

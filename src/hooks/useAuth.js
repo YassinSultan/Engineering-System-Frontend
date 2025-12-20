@@ -1,13 +1,11 @@
 // src/hooks/useAuth.js
 import { useSelector } from "react-redux";
-import { hasAnyPermission, hasPermission } from "../utils/permission.utils";
 
-
+import { hasPermission, hasAnyPermission } from "../utils/permission.utils";
 export const useAuth = () => {
     const { token, user, loading, initialized, error } = useSelector(
         (state) => state.auth
     );
-
     return {
         token,
         user,

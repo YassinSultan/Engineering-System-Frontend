@@ -1,15 +1,14 @@
 // src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/axiosInstance";
-import { normalizePermissions } from "../../utils/permission.utils"; // Import the utility
 
-// جلب بيانات المستخدم الكاملة
+
 export const fetchUserProfile = createAsyncThunk(
     "auth/fetchUserProfile",
     async (_, { rejectWithValue }) => {
         try {
             const res = await api.get("/auth/me");
-            return res.data.data; // user object
+            return res.data.data;
         } catch (err) {
             return rejectWithValue(err.response?.data);
         }
@@ -18,9 +17,9 @@ export const fetchUserProfile = createAsyncThunk(
 
 const initialState = {
     token: localStorage.getItem("token"),
-    user: null,        // كل بيانات المستخدم + permissions
+    user: null,
     loading: false,
-    initialized: false, // مهم جدًا
+    initialized: false,
     error: null,
 };
 
@@ -32,8 +31,6 @@ const authSlice = createSlice({
             const { token } = action.payload;
             localStorage.setItem("token", token);
             state.token = token;
-            state.user = null;
-            state.initialized = false;
         },
         logout: (state) => {
             localStorage.removeItem("token");
@@ -49,11 +46,7 @@ const authSlice = createSlice({
             })
             .addCase(fetchUserProfile.fulfilled, (state, action) => {
                 state.loading = false;
-                const userData = action.payload;
-                state.user = {
-                    ...userData,
-                    permissions: normalizePermissions(userData.permissions), // Normalize permissions here
-                };
+                state.user = action.payload;
                 state.initialized = true;
             })
             .addCase(fetchUserProfile.rejected, (state, action) => {

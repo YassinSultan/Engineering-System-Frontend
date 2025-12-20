@@ -48,6 +48,12 @@ const menu = [
       },
     ],
   },
+  {
+    label: "الوحدات التنظيمية",
+    icon: <BiBuilding className="size-5" />,
+    path: "/organization-units",
+    permissions: ["organization-units:read"], // سوبر أدمن بس، بنخليه يظهر في الكود زي ما هو
+  },
 ];
 
 export default function Sidebar() {

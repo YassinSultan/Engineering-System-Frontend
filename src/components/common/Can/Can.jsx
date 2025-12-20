@@ -1,39 +1,27 @@
-import React from "react";
+// frontend/src/components/Can.jsx
 
-import {
-  hasAnyPermission,
-  hasPermission,
-} from "../../../utils/permission.utils";
+import React from "react";
 import { useAuth } from "../../../hooks/useAuth";
 
 /**
  * مكون Can: يعرض children فقط إذا كانت الصلاحية موجودة
- *
- * استخدام:
- * <Can action="companies:read" unitId={companyUnitId}>
- *   <button>تعديل الشركة</button>
- * </Can>
- *
- * <Can any={["users:create", "users:update"]}>
- *   <button>إضافة مستخدم</button>
- * </Can>
  */
 export default function Can({
   children,
-  action, // صلاحية واحدة مثل "companies:update"
-  any, // مصفوفة من الصلاحيات، يكفي وجود واحدة
-  unitId, // معرف الوحدة التنظيمية إذا لزم الأمر
-  fallback = null, // ما يُعرض إذا لم تكن الصلاحية موجودة
+  action, // صلاحية واحدة
+  any, // مصفوفة من الصلاحيات
+  unitId, // resourceUnitId
+  fallback = null,
 }) {
-  const { user } = useAuth(); // أو أي طريقة تحصل بها على المستخدم الحالي
+  const { hasPermission, hasAnyPermission } = useAuth();
 
-  if (!user) return fallback;
+  if (!hasPermission || !hasAnyPermission) return fallback;
 
   const allowed = any
-    ? hasAnyPermission(user, any, unitId)
+    ? hasAnyPermission(any, unitId)
     : action
-    ? hasPermission(user, action, unitId)
-    : true; // إذا لم يُحدد action ولا any → يعرض دائمًا
+    ? hasPermission(action, unitId)
+    : true;
 
   return allowed ? <>{children}</> : fallback;
 }
