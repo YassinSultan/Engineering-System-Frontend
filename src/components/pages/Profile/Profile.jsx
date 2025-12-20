@@ -21,7 +21,7 @@ export default function Profile() {
         <div className="mb-4">
           <PageTitle title="الملف الشخصي" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <div className="bg-base w-full p-2 rounded-lg shadow-md col-span-3">
             <h3 className="text-xl">المعلومات الشخصية</h3>
             <div className="flex flex-col">
@@ -65,16 +65,9 @@ export default function Profile() {
                   {profile?.data.role || "----"}
                 </span>
               </div>
-              <div className="w-full flex py-4 px-2 border-b last:border-b-0">
-                <span className="w-1/4 font-semibold"> الصلاحيات</span>
-                <span className="w-3/4 font-light">
-                  {profile?.data.permissions.map((p) => p).join(" , ") ||
-                    "----"}
-                </span>
-              </div>
             </div>
           </div>
-          <div className="bg-base p-2 flex flex-col items-center py-5 h-fit w-full shadow-md">
+          <div className="bg-base p-2 flex flex-col items-center justify-center py-5 w-full shadow-md rounded-lg">
             <div>
               <img
                 src={profile?.data.avatar}
@@ -99,6 +92,41 @@ export default function Profile() {
               >
                 تغيير كلمة المرور
               </Button>
+            </div>
+          </div>
+          {/* الصلاحيات */}
+          <div className="bg-base p-2 flex flex-col py-5 h-fit col-span-full shadow-md rounded-lg">
+            <h3 className="text-xl mb-2">الصلاحيات</h3>
+            <div className="relative overflow-x-auto">
+              <table className="w-full text-sm text-start text-body">
+                <thead className="text-sm bg-base border-b rounded-base">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 font-bold text-start">
+                      الصلاحية
+                    </th>
+                    <th scope="col" className="px-6 py-3 font-bold text-start">
+                      النطاق
+                    </th>
+                    <th scope="col" className="px-6 py-3 font-bold text-start">
+                      الوحدة
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {profile?.data?.permissions?.map((permission) => (
+                    <tr
+                      className="bg-background border-b border-default hover:bg-neutral-secondary-soft"
+                      key={permission.id}
+                    >
+                      <td className="px-6 py-4">{permission.action}</td>
+                      <td className="px-6 py-4">{permission.scope}</td>
+                      <td className="px-6 py-4">
+                        {permission.units.map((u) => u).join(", ") || "----"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
