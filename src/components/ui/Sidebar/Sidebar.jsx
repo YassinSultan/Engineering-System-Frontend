@@ -1,6 +1,6 @@
 import React from "react";
 import { BiBuilding, BiHome, BiLogOut, BiPackage } from "react-icons/bi";
-import { IoIosArrowDown } from "react-icons/io";
+import { FaProjectDiagram } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import Button from "../Button/Button";
@@ -27,6 +27,23 @@ const menu = [
       {
         label: "قائمة الشركات",
         path: "/companies",
+        permissions: ["companies:read", "companies:update", "companies:delete"],
+      },
+    ],
+  },
+  {
+    label: "المشاريع",
+    icon: <FaProjectDiagram className="size-5" />,
+    path: "/projects",
+    children: [
+      {
+        label: "إضافة مشروع",
+        path: "/projects/create",
+        permissions: ["companies:create"],
+      },
+      {
+        label: "قائمة المشاريع",
+        path: "/projects",
         permissions: ["companies:read", "companies:update", "companies:delete"],
       },
     ],

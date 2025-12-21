@@ -25,6 +25,7 @@ import UpdateUser from "./components/pages/User/UpdateUser";
 import SpecificCompany from "./components/pages/Company/SpecificCompany";
 import OrganizationUnits from "./components/pages/OrganizationUnits/OrganizationUnits";
 import AddOrganizationUnits from "./components/pages/OrganizationUnits/AddOrganizationUnits";
+import AddProject from "./components/pages/Project/AddProject";
 
 const router = createBrowserRouter([
   {
@@ -113,6 +114,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requirePermissions={["companies:read"]}>
             <SpecificCompany />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "projects/create",
+        element: (
+          <ProtectedRoute requirePermissions={["companies:create"]}>
+            <AddProject />
           </ProtectedRoute>
         ),
       },
