@@ -9,3 +9,7 @@ export const createProject = async (formData) => {
     });
     return response.data;
 };
+export const getProjects = async (filters) => {
+    const res = await api.get("/projects", { params: filters });
+    return res.data;
+};
