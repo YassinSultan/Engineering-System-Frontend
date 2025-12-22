@@ -8,15 +8,18 @@ export default function ProtectedRoute({
   requirePermissions,
   resourceUnitId = null,
 }) {
-  const { token, hasAnyPermission, isLoading, initialized } = useAuth();
+  const { token, hasAnyPermission, isLoading, initialized, user } = useAuth();
   const location = useLocation();
+  console.log(initialized);
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   if (!initialized || isLoading) {
     return <Loading />;
   }
-
+  if (initialized && !user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
   if (
     requirePermissions &&
     !hasAnyPermission(requirePermissions, resourceUnitId)
