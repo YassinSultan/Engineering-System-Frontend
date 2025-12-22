@@ -7,6 +7,9 @@ import Button from "../../ui/Button/Button";
 import FileInput from "../../ui/FileInput/FileInput";
 import OrganizationalTreeModal from "../../common/OrganizationalTreeModal/OrganizationalTreeModal";
 import { createOwnerEntity, getOwnerEntity } from "../../../api/ownerEntityApi";
+import { useMutation } from "@tanstack/react-query";
+import { createProject } from "../../../api/projectApi";
+import toast from "react-hot-toast";
 
 export default function AddProject() {
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
@@ -25,10 +28,26 @@ export default function AddProject() {
     control,
     name: "organizationalUnit",
   });
+
+  const mutation = useMutation({
+    mutationKey: ["createProject"],
+    mutationFn: createProject,
+    onSuccess: () => {
+      toast.success("تم انشاء المشروع بنجاح");
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.response.data.message);
+    },
+  });
   const onSubmit = (data) => {
+    const getNestedValue = (obj, path) =>
+      path.split(".").reduce((acc, key) => acc?.[key], obj);
+
     console.log("data", data);
+
     const formData = new FormData();
-    // text fields
+
     const textFields = [
       "name",
       "code",
@@ -39,31 +58,47 @@ export default function AddProject() {
       "landArea",
       "fiscalYear",
       "estimatedCost.value",
-      "estimatedCost.value",
     ];
+
     textFields.forEach((field) => {
-      if (data[field] !== undefined && data[field] !== null) {
-        formData.append(field, data[field]);
-      }
-    });
-    const filesFields = [
-      "networkBudgetFile",
-      "siteHandoverFile",
-      "estimatedCost.file",
-    ];
-    filesFields.forEach((field) => {
-      if (data[field] !== undefined && data[field] !== null) {
-        formData.append(field, data[field]);
+      const value = getNestedValue(data, field);
+      if (value !== undefined && value !== null) {
+        formData.append(field, value);
       }
     });
 
-    // customs fields
-    formData.append("contractingParty", data.contractingParty.value);
-    formData.append("status", data.status.value);
-    // print formData
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
+    const fileFields = [
+      "networkBudgetFile",
+      "siteHandoverFile",
+      "estimatedCost",
+    ];
+
+    fileFields.forEach((field) => {
+      if (data[field] && data[field].length > 0) {
+        formData.append(field, data[field][0]);
+      }
+    });
+
+    // select fields
+    if (data.contractingParty?.value) {
+      formData.append("contractingParty", data.contractingParty.value);
     }
+    if (data.organizationalUnit) {
+      formData.append("organizationalUnit", data.organizationalUnit._id);
+    }
+    if (data.ownerEntity?.value) {
+      formData.append("ownerEntity", data.ownerEntity.value);
+    }
+    if (data.status?.value) {
+      formData.append("status", data.status.value);
+    }
+
+    // Debug
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    mutation.mutate(formData);
   };
   return (
     <>
@@ -171,6 +206,16 @@ export default function AddProject() {
                   })}
                   error={errors.location}
                   rules={{ required: "موقع المشروع مطلوب" }}
+                />
+              </div>
+              <div>
+                <Input
+                  label="مساحة المشروع بالمتر مربع"
+                  {...register("landArea", {
+                    required: "مساحة المشروع مطلوب",
+                  })}
+                  error={errors.landArea}
+                  rules={{ required: "مساحة المشروع مطلوب" }}
                 />
               </div>
               <div className="col-span-full">
@@ -286,7 +331,7 @@ export default function AddProject() {
                 </div>
               )}
             </div>
-            <div className="col-span-full">
+            <div className="col-span-full mt-2">
               <label className="block text-sm font-medium mb-1">
                 الوحدة التابع لها
               </label>
