@@ -38,7 +38,7 @@ export default function SearchInput({
   };
 
   return (
-    <div className="w-full my-4">
+    <div className="w-full">
       <div className="flex">
         {/* اختيار نوع البحث */}
         <select
