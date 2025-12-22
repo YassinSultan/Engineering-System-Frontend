@@ -87,7 +87,7 @@ const FileInput = forwardRef(
 
         {/* File List */}
         {selectedFiles.length > 0 && (
-          <div className="mt-3 p-3 border rounded-lg bg-primary-500 text-primary-content-500">
+          <div className="mt-3 p-3 border rounded-lg">
             <p className="font-medium text-sm mb-2">الملفات المختارة:</p>
             <ul className="text-sm space-y-2">
               {selectedFiles.map((file, index) => (
@@ -102,7 +102,7 @@ const FileInput = forwardRef(
                   <button
                     type="button"
                     onClick={() => removeFile(index)}
-                    className="bg-red-500 px-2 py-1.5 hover:underline text-xs"
+                    className="bg-red-500 rounded-lg text-white px-2 py-1.5 hover:underline text-xs cursor-pointer"
                   >
                     حذف
                   </button>
