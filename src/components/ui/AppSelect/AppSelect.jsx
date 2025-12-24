@@ -17,6 +17,8 @@ export default function AppSelect({
   isCreatable = true,
   loadOptionsFn = null,
   createOptionsFn = null,
+  isSearchable = true,
+  size = "md",
 }) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -76,20 +78,59 @@ export default function AppSelect({
         ? "var(--color-primary-500)"
         : "var(--color-foreground)",
       borderRadius: "8px",
-      minHeight: "48px",
+      minHeight: size === "sm" ? "32px" : "48px",
       boxShadow: "none",
+      alignItems: "center",
     }),
+
+    valueContainer: (base) => ({
+      ...base,
+      padding: size === "sm" ? "0 8px" : "0 12px",
+      boxSizing: "border-box",
+      alignItems: "center",
+    }),
+
+    input: (base) => ({
+      ...base,
+      margin: 0,
+      padding: "0",
+    }),
+
+    singleValue: (base) => ({
+      ...base,
+      color: "var(--color-foreground)",
+    }),
+
     menu: (base) => ({
       ...base,
       zIndex: 9999,
       backgroundColor: "var(--color-background)",
     }),
+
     placeholder: () => ({
       display: "none",
+    }),
+
+    option: (base, state) => ({
+      ...base,
+      fontSize: "14px",
+      padding: "10px 12px",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+      backgroundColor: state.isSelected
+        ? "var(--color-primary-500)"
+        : state.isFocused
+        ? "var(--color-primary-50)"
+        : "transparent",
+      color: state.isSelected
+        ? "var(--color-primary-content-500)"
+        : state.isFocused
+        ? "var(--color-primary-content-50)"
+        : "",
     }),
   };
 
   const commonProps = {
+    isSearchable,
     value,
     onChange,
     isMulti,
