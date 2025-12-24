@@ -137,6 +137,10 @@ export default function AppSelect({
     styles,
     onFocus: () => setIsFocused(true),
     onBlur: () => setIsFocused(false),
+
+    menuPlacement: "auto",
+    menuPosition: "fixed",
+    menuPortalTarget: document.body,
   };
 
   return (
