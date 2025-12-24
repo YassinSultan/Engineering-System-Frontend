@@ -14,6 +14,7 @@ import {
   BiChevronsRight,
 } from "react-icons/bi";
 import { FaArrowsUpDown } from "react-icons/fa6";
+import AppSelect from "../../ui/AppSelect/AppSelect";
 
 export default function DataTable({
   data = [],
@@ -188,26 +189,33 @@ export default function DataTable({
           </div>
 
           <div className="flex items-center gap-4">
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                onPageSizeChange(Number(e.target.value));
-                onPageChange(0);
-              }}
-              className="px-3 py-1.5 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              {[10, 25, 50, 100].map((size) => (
-                <option key={size} value={size}>
-                  {size} / صفحة
-                </option>
-              ))}
-            </select>
-
+            <div className="w-35">
+              <AppSelect
+                isSearchable={false}
+                size="sm"
+                label=""
+                value={{
+                  value: pageSize,
+                  label: `${pageSize}/ صفحة`,
+                }}
+                options={[
+                  { value: 1, label: "1" },
+                  { value: 10, label: "10" },
+                  { value: 25, label: "25" },
+                  { value: 50, label: "50" },
+                  { value: 100, label: "100" },
+                ]}
+                onChange={(option) => {
+                  onPageSizeChange(Number(option.value));
+                  onPageChange(0);
+                }}
+              />
+            </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => onPageChange(0)}
                 disabled={pageIndex === 0}
-                className="p-1.5 rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent transition-colors"
+                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
                 title="الصفحة الأولى"
               >
                 <BiChevronsRight className="w-4 h-4" />
@@ -215,7 +223,7 @@ export default function DataTable({
               <button
                 onClick={() => onPageChange(pageIndex - 1)}
                 disabled={pageIndex === 0}
-                className="p-1.5 rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent transition-colors"
+                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
                 title="الصفحة السابقة"
               >
                 <BiChevronRight className="w-4 h-4" />
@@ -228,7 +236,7 @@ export default function DataTable({
               <button
                 onClick={() => onPageChange(pageIndex + 1)}
                 disabled={pageIndex >= pageCount - 1}
-                className="p-1.5 rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent transition-colors"
+                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
                 title="الصفحة التالية"
               >
                 <BiChevronLeft className="w-4 h-4" />
@@ -236,7 +244,7 @@ export default function DataTable({
               <button
                 onClick={() => onPageChange(pageCount - 1)}
                 disabled={pageIndex >= pageCount - 1}
-                className="p-1.5 rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent transition-colors"
+                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
                 title="الصفحة الأخيرة"
               >
                 <BiChevronsLeft className="w-4 h-4" />
