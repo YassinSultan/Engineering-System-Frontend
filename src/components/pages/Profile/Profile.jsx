@@ -68,12 +68,11 @@ export default function Profile() {
             </div>
           </div>
           <div className="bg-base p-2 flex flex-col items-center justify-center py-5 w-full shadow-md rounded-lg">
-            <div>
+            <div className="border p-3 rounded-full w-24 h-24 bg-white">
               <img
                 src={profile?.data.avatar}
-                alt="profile"
-                width={100}
-                height={100}
+                alt="avatar"
+                className="object-contain w-full h-full"
               />
             </div>
             <div className="text-center">
