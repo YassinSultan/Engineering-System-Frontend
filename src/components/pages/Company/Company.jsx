@@ -396,7 +396,7 @@ export default function Company() {
   if (isLoading) return <Loading />;
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <PageTitle
           title="ادارة الشركات"
           subTitle="عرض وإدارة جميع الشركات المسجلة في النظام"
@@ -420,7 +420,7 @@ export default function Company() {
           </Can>
         </div>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <div className="w-1/2">
           <SearchInput
             fields={fields}
