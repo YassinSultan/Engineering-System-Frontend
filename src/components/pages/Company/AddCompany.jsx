@@ -6,6 +6,7 @@ import FileInput from "../../ui/FileInput/FileInput";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import { createCompany } from "../../../api/companyAPI";
 import toast from "react-hot-toast";
+import PageTitle from "../../ui/PageTitle/PageTitle";
 
 export default function AddCompany() {
   const {
@@ -88,192 +89,197 @@ export default function AddCompany() {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border-b pb-2 mb-2">
-          <div>
-            <Input
-              label="كود الشركة"
-              {...register("companyCode", { required: "اسم الشركة مطلوب" })}
-              type="text"
-              error={errors.companyCode}
-            />
-          </div>
-          <div>
-            <Input
-              label="رقم السجل"
-              {...register("commercialRegister")}
-              type="text"
-              error={errors.commercialRegister}
-            />
-          </div>
-          <div>
-            <Input
-              label="رقم الموافقة الامنية"
-              {...register("securityApprovalNumber")}
-              type="text"
-              error={errors.securityApprovalNumber}
-            />
-          </div>
-          <div>
-            <Input
-              label="تاريخ الموافقة الامنية"
-              {...register("securityApprovalDate")}
-              type="date"
-              error={errors.securityApprovalDate}
-            />
-          </div>
-          <div>
-            <Input
-              label="العام المالي"
-              {...register("fiscalYear")}
-              type="text"
-              error={errors.fiscalYear}
-            />
-          </div>
-          <div>
-            <Input
-              label="اسم الشركة"
-              {...register("companyName")}
-              type="text"
-              error={errors.companyName}
-            />
-          </div>
-          <div>
-            <Input
-              label="فئة الشركة"
-              {...register("companyCategory")}
-              type="text"
-              error={errors.companyCategory}
-            />
-          </div>
-          <div>
-            <Input
-              label="سمة التجارية الشركة"
-              {...register("companyBrand")}
-              type="text"
-              error={errors.companyBrand}
-            />
-          </div>
-          <div>
-            <Input
-              label="نشاط الشركة"
-              {...register("companyActivity")}
-              type="text"
-              error={errors.companyActivity}
-            />
-          </div>
-          <div>
-            <Input
-              label="مالك الشركة"
-              {...register("ownerName")}
-              type="text"
-              error={errors.ownerName}
-            />
-          </div>
-          <div>
-            <Input
-              label="رقم هوية مالك الشركة"
-              {...register("ownerNID")}
-              type="text"
-              error={errors.ownerNID}
-            />
-          </div>
-          <div>
-            <Input
-              label="اسم المنوب"
-              {...register("representativeName")}
-              type="text"
-              error={errors.representativeName}
-            />
-          </div>
-          <div>
-            <Input
-              label="فاكس الشركة"
-              {...register("fax")}
-              type="text"
-              error={errors.fax}
-            />
-          </div>
-          <div>
-            <Input
-              label="عنوان الشركة"
-              {...register("address")}
-              type="text"
-              error={errors.address}
-            />
-          </div>
-          <div className="col-span-full flex flex-col gap-2">
-            {fields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
-                <div className="flex-1">
-                  <Input
-                    label="رقم هاتف"
-                    {...register(`phones.${index}.phone`)}
-                    type="phone"
-                    error={errors.phone}
-                  />
-                </div>
-                {index > 0 && (
-                  <Button
-                    type="button"
-                    variant="danger"
-                    onClick={() => remove(index)}
-                  >
-                    حذف
-                  </Button>
-                )}
-              </div>
-            ))}
+      <section>
+        <div className="mb-4">
+          <PageTitle title="اضافة شركة جديدة" />
+        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border-b pb-2 mb-2">
             <div>
-              <Button type="button" onClick={() => append({ number: "" })}>
-                اضافة رقم
-              </Button>
+              <Input
+                label="كود الشركة"
+                {...register("companyCode", { required: "اسم الشركة مطلوب" })}
+                type="text"
+                error={errors.companyCode}
+              />
+            </div>
+            <div>
+              <Input
+                label="رقم السجل"
+                {...register("commercialRegister")}
+                type="text"
+                error={errors.commercialRegister}
+              />
+            </div>
+            <div>
+              <Input
+                label="رقم الموافقة الامنية"
+                {...register("securityApprovalNumber")}
+                type="text"
+                error={errors.securityApprovalNumber}
+              />
+            </div>
+            <div>
+              <Input
+                label="تاريخ الموافقة الامنية"
+                {...register("securityApprovalDate")}
+                type="date"
+                error={errors.securityApprovalDate}
+              />
+            </div>
+            <div>
+              <Input
+                label="العام المالي"
+                {...register("fiscalYear")}
+                type="text"
+                error={errors.fiscalYear}
+              />
+            </div>
+            <div>
+              <Input
+                label="اسم الشركة"
+                {...register("companyName")}
+                type="text"
+                error={errors.companyName}
+              />
+            </div>
+            <div>
+              <Input
+                label="فئة الشركة"
+                {...register("companyCategory")}
+                type="text"
+                error={errors.companyCategory}
+              />
+            </div>
+            <div>
+              <Input
+                label="سمة التجارية الشركة"
+                {...register("companyBrand")}
+                type="text"
+                error={errors.companyBrand}
+              />
+            </div>
+            <div>
+              <Input
+                label="نشاط الشركة"
+                {...register("companyActivity")}
+                type="text"
+                error={errors.companyActivity}
+              />
+            </div>
+            <div>
+              <Input
+                label="مالك الشركة"
+                {...register("ownerName")}
+                type="text"
+                error={errors.ownerName}
+              />
+            </div>
+            <div>
+              <Input
+                label="رقم هوية مالك الشركة"
+                {...register("ownerNID")}
+                type="text"
+                error={errors.ownerNID}
+              />
+            </div>
+            <div>
+              <Input
+                label="اسم المنوب"
+                {...register("representativeName")}
+                type="text"
+                error={errors.representativeName}
+              />
+            </div>
+            <div>
+              <Input
+                label="فاكس الشركة"
+                {...register("fax")}
+                type="text"
+                error={errors.fax}
+              />
+            </div>
+            <div>
+              <Input
+                label="عنوان الشركة"
+                {...register("address")}
+                type="text"
+                error={errors.address}
+              />
+            </div>
+            <div className="col-span-full flex flex-col gap-2">
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <div className="flex-1">
+                    <Input
+                      label="رقم هاتف"
+                      {...register(`phones.${index}.phone`)}
+                      type="phone"
+                      error={errors.phone}
+                    />
+                  </div>
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      onClick={() => remove(index)}
+                    >
+                      حذف
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <div>
+                <Button type="button" onClick={() => append({ number: "" })}>
+                  اضافة رقم
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Input
+                label="البريد الالكتروني"
+                {...register("email")}
+                type="email"
+                error={errors.email}
+              />
+            </div>
+            <div>
+              <Input
+                label="الشكل القانوني"
+                {...register("legalForm")}
+                type="text"
+                error={errors.legalForm}
+              />
+            </div>
+            <div>
+              <Input
+                label="رقم الملف بمكتب الامن"
+                {...register("securityFileNumber")}
+                type="text"
+                error={errors.securityFileNumber}
+              />
+            </div>
+            <div className="col-span-full">
+              <FileInput
+                label="موافقة الامنية"
+                id="securityApprovalFile"
+                {...register("securityApprovalFile", { required: true })}
+              />
+            </div>
+            <div className="col-span-full">
+              <FileInput
+                label="مستندات الشركة"
+                id="companyDocuments"
+                multiple
+                {...register("companyDocuments", { required: true })}
+              />
             </div>
           </div>
           <div>
-            <Input
-              label="البريد الالكتروني"
-              {...register("email")}
-              type="email"
-              error={errors.email}
-            />
+            <Button type="submit">اضافة</Button>
           </div>
-          <div>
-            <Input
-              label="الشكل القانوني"
-              {...register("legalForm")}
-              type="text"
-              error={errors.legalForm}
-            />
-          </div>
-          <div>
-            <Input
-              label="رقم الملف بمكتب الامن"
-              {...register("securityFileNumber")}
-              type="text"
-              error={errors.securityFileNumber}
-            />
-          </div>
-          <div className="col-span-full">
-            <FileInput
-              label="موافقة الامنية"
-              id="securityApprovalFile"
-              {...register("securityApprovalFile", { required: true })}
-            />
-          </div>
-          <div className="col-span-full">
-            <FileInput
-              label="مستندات الشركة"
-              id="companyDocuments"
-              multiple
-              {...register("companyDocuments", { required: true })}
-            />
-          </div>
-        </div>
-        <div>
-          <Button type="submit">اضافة</Button>
-        </div>
-      </form>
+        </form>
+      </section>
     </>
   );
 }
