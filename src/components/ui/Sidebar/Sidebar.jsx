@@ -98,25 +98,6 @@ export default function Sidebar() {
             />
           ))}
         </div>
-        {/* ادارة الوحدات */}
-        {user?.role === "SUPER_ADMIN" && (
-          <NavLink
-            to="/organization-units"
-            end
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 my-2 font-medium transition-all duration-200 rounded-lg ${
-                isActive
-                  ? "bg-primary-200 text-primary-content-200 shadow-md"
-                  : "hover:bg-primary-100 hover:text-primary-content-100"
-              }`
-            }
-          >
-            <span className="text-primary">
-              <BiBuilding className="size-5" />
-            </span>
-            {isOpen && <span>ادارة الوحدات</span>}
-          </NavLink>
-        )}
         {/* User Profile & Logout */}
         <div className="border-t border-primary-200 py-4 px-2">
           {user && (

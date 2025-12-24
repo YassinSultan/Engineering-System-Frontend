@@ -70,12 +70,15 @@ export default function AddProject() {
     const fileFields = [
       "networkBudgetFile",
       "siteHandoverFile",
-      "estimatedCost",
+      "estimatedCost.file",
+      "securityApprovalFile",
     ];
 
     fileFields.forEach((field) => {
-      if (data[field] && data[field].length > 0) {
-        formData.append(field, data[field][0]);
+      const value = getNestedValue(data, field);
+      console.log("value", value);
+      if (value !== undefined && value !== null) {
+        formData.append(field, value[0]);
       }
     });
 
