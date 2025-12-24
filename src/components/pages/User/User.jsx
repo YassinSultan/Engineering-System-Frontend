@@ -261,11 +261,12 @@ export default function User() {
   if (isLoading) return <Loading />;
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <PageTitle
           title="ادارة المستخدمين"
           subTitle="يمكنك التحكم في المستخدمين من هنا"
         />
+
         <div className="flex gap-2">
           <Can action="users:read">
             <Button
@@ -284,7 +285,7 @@ export default function User() {
           </Can>
         </div>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <div className="w-1/2">
           <SearchInput
             fields={fields}
