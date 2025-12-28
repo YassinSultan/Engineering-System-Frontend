@@ -10,6 +10,7 @@ export default function Button({
   icon = null,
   className = "",
   type = "button",
+  iconPosition = "start",
   ...props
 }) {
   const baseStyles =
@@ -52,8 +53,9 @@ export default function Button({
       disabled={disabled}
       {...props}
     >
-      {icon && <span className="ml-2">{icon}</span>}
+      {icon && iconPosition === "start" && <span className="ml-2">{icon}</span>}
       {children}
+      {icon && iconPosition === "end" && <span className="ms-2">{icon}</span>}
     </button>
   );
 }
