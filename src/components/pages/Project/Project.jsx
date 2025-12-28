@@ -218,8 +218,8 @@ export default function Project() {
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <Can action="users:read">
-            <NavLink to={`/users/read/${row.original._id}`}>
+          <Can action="projects:read">
+            <NavLink to={`/projects/read/${row.original._id}`}>
               <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                 <BsEye className="w-4 h-4" />
               </button>

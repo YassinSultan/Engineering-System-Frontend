@@ -28,6 +28,7 @@ import AddOrganizationUnits from "./components/pages/OrganizationUnits/AddOrgani
 import AddProject from "./components/pages/Project/AddProject";
 import Project from "./components/pages/Project/Project";
 import SpecificUser from "./components/pages/User/SpecificUser";
+import SpecificProject from "./components/pages/Project/SpecificProject";
 
 const router = createBrowserRouter([
   {
@@ -132,6 +133,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requirePermissions={["projects:create"]}>
             <AddProject />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "projects/read/:id",
+        element: (
+          <ProtectedRoute requirePermissions={["projects:create"]}>
+            <SpecificProject />
           </ProtectedRoute>
         ),
       },
