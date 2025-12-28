@@ -41,7 +41,7 @@ const Modal = ({
           <h2 className="text-2xl font-semibold">{title}</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-accent transition-colors"
+            className="p-2 rounded-lg hover:bg-primary-600 transition-colors cursor-pointer"
             aria-label="إغلاق"
           >
             <BiX size={30} />
