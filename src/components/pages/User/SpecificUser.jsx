@@ -5,7 +5,7 @@ import { getUser } from "../../../api/userAPI";
 import Loading from "../../common/Loading/Loading";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Button from "../../ui/Button/Button";
-import { BsArrowRight } from "react-icons/bs";
+import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
 import Card from "../../ui/Card/Card";
 import CardHeader from "../../ui/Card/CardHeader";
 import CardBody from "../../ui/Card/CardBody";
@@ -27,7 +27,7 @@ export default function SpecificUser() {
       <div className="flex items-center justify-between mb-4">
         <PageTitle title={"بيانات المستخدم"} />
         <NavLink to={"/users"}>
-          <Button variant="secondary" icon={<BsArrowRight />}>
+          <Button variant="secondary" icon={<BsArrowLeft />} iconPosition="end">
             العودة للخلف
           </Button>
         </NavLink>
