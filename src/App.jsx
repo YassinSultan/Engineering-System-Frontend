@@ -25,10 +25,10 @@ import UpdateUser from "./components/pages/User/UpdateUser";
 import SpecificCompany from "./components/pages/Company/SpecificCompany";
 import OrganizationUnits from "./components/pages/OrganizationUnits/OrganizationUnits";
 import AddOrganizationUnits from "./components/pages/OrganizationUnits/AddOrganizationUnits";
-import AddProject from "./components/pages/Project/AddProject";
 import Project from "./components/pages/Project/Project";
 import SpecificUser from "./components/pages/User/SpecificUser";
 import SpecificProject from "./components/pages/Project/SpecificProject";
+import ProjectForm from "./components/pages/Project/ProjectForm";
 
 const router = createBrowserRouter([
   {
@@ -132,7 +132,15 @@ const router = createBrowserRouter([
         path: "projects/create",
         element: (
           <ProtectedRoute requirePermissions={["projects:create"]}>
-            <AddProject />
+            <ProjectForm mode="create" />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "projects/update/:id",
+        element: (
+          <ProtectedRoute requirePermissions={["projects:update"]}>
+            <ProjectForm mode="update" />
           </ProtectedRoute>
         ),
       },

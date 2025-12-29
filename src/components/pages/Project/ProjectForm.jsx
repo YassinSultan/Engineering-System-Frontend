@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import AppSelect from "../../ui/AppSelect/AppSelect";
@@ -7,19 +7,36 @@ import Button from "../../ui/Button/Button";
 import FileInput from "../../ui/FileInput/FileInput";
 import OrganizationalTreeModal from "../../common/OrganizationalTreeModal/OrganizationalTreeModal";
 import { createOwnerEntity, getOwnerEntity } from "../../../api/ownerEntityApi";
-import { useMutation } from "@tanstack/react-query";
-import { createProject } from "../../../api/projectApi";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  createProject,
+  getProject,
+  updateProject,
+} from "../../../api/projectApi";
 import toast from "react-hot-toast";
+import { useParams } from "react-router";
+import Loading from "../../common/Loading/Loading";
 
-export default function AddProject() {
+export default function ProjectForm({ mode = "create" }) {
+  const { id } = useParams();
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
+  const isUpdate = mode === "update";
+  const { data, isLoading } = useQuery({
+    queryKey: ["project", id],
+    queryFn: () => getProject(id),
+    select: (res) => res.data,
+    enabled: mode === "update",
+  });
   const {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
     setValue,
-  } = useForm();
+  } = useForm({
+    defaultValues: isUpdate ? data : {},
+  });
   const contractingParty = useWatch({
     control,
     name: "contractingParty",
@@ -30,22 +47,28 @@ export default function AddProject() {
   });
 
   const mutation = useMutation({
-    mutationKey: ["createProject"],
-    mutationFn: createProject,
-    onSuccess: () => {
-      toast.success("تم انشاء المشروع بنجاح");
+    mutationFn: mode === "create" ? createProject : updateProject,
+    onSuccess: (res) => {
+      console.log("res", res);
+      toast.success(
+        mode === "create" ? "تم إنشاء المشروع بنجاح" : "تم تحديث المشروع بنجاح"
+      );
     },
-    onError: (error) => {
-      console.log(error);
-      toast.error(error.response.data.message);
+    onError: (err) => {
+      console.error(err);
+      toast.error(
+        mode === "create"
+          ? "حدث خطأ في انشاء المشروع"
+          : "حدث خطأ في تحديث المشروع"
+      );
     },
   });
   const onSubmit = (data) => {
     const getNestedValue = (obj, path) =>
-      path.split(".").reduce((acc, key) => acc?.[key], obj);
-
-    console.log("data", data);
-
+      path
+        .replace(/\[(\w+)\]/g, ".$1")
+        .split(".")
+        .reduce((acc, key) => acc?.[key], obj);
     const formData = new FormData();
 
     const textFields = [
@@ -53,11 +76,11 @@ export default function AddProject() {
       "code",
       "startDate",
       "location",
-      "coordinates.lat",
-      "coordinates.lng",
+      "coordinates[lat]",
+      "coordinates[lng]",
       "landArea",
       "fiscalYear",
-      "estimatedCost.value",
+      "estimatedCost[value]",
     ];
 
     textFields.forEach((field) => {
@@ -76,8 +99,7 @@ export default function AddProject() {
 
     fileFields.forEach((field) => {
       const value = getNestedValue(data, field);
-      console.log("value", value);
-      if (value !== undefined && value !== null) {
+      if (value instanceof FileList && value.length > 0) {
         formData.append(field, value[0]);
       }
     });
@@ -96,18 +118,60 @@ export default function AddProject() {
       formData.append("status", data.status.value);
     }
 
-    // Debug
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
+    // print form data label values
+    console.log("form data");
+    for (const pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
     }
-
-    mutation.mutate(formData);
+    mutation.mutate({
+      id: data._id,
+      data: formData,
+    });
   };
+
+  // reset form
+  useEffect(() => {
+    if (isUpdate && data) {
+      reset({
+        ...data,
+        startDate: data.startDate ? data.startDate.split("T")[0] : "",
+        contractingParty: {
+          value: data.contractingParty,
+          label:
+            data.contractingParty === "CIVILIAN"
+              ? "جهة مدنية"
+              : data.contractingParty === "MILITARY"
+              ? "جهة عسكرية"
+              : "جهة موازنة",
+        },
+        status: {
+          value: data.status,
+          label:
+            data.status === "STUDY"
+              ? "دراسة"
+              : data.status === "ONGOING"
+              ? "جاري"
+              : "منتهي",
+        },
+        ownerEntity: data.ownerEntity
+          ? {
+              value: data.ownerEntity._id,
+              label: data.ownerEntity.name,
+            }
+          : null,
+        organizationalUnit: data.organizationalUnit?.[0] || null,
+      });
+    }
+  }, [mode, data, reset, isUpdate]);
+
+  if (isLoading) return <Loading />;
   return (
     <>
       <section>
         <div className="mb-4">
-          <PageTitle title="اضافة مشروع جديد" />
+          <PageTitle
+            title={mode === "create" ? "إضافة مشروع جديد" : "تعديل المشروع"}
+          />
         </div>
         <div>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -226,12 +290,26 @@ export default function AddProject() {
                   <FileInput
                     label="ملف الميزانية الشبكية"
                     id="networkBudgetFile"
-                    {...register("networkBudgetFile", { required: true })}
+                    existingFiles={
+                      mode === "update" && data?.networkBudgetFile
+                        ? [data.networkBudgetFile]
+                        : []
+                    }
+                    {...register("networkBudgetFile", {
+                      required: mode === "create",
+                    })}
                   />
                   <FileInput
                     label="ملف استلام الموقع"
                     id="siteHandoverFile"
-                    {...register("siteHandoverFile", { required: true })}
+                    existingFiles={
+                      mode === "update" && data?.siteHandoverFile
+                        ? [data.siteHandoverFile]
+                        : []
+                    }
+                    {...register("siteHandoverFile", {
+                      required: mode === "create",
+                    })}
                   />
                 </div>
               </div>
@@ -240,7 +318,7 @@ export default function AddProject() {
                   <div>
                     <Input
                       label="احداثي الارض (خط الطول)"
-                      {...register("coordinates.lat", {
+                      {...register("coordinates[lat]", {
                         required: "احداثي ارض المشروع مطلوب",
                       })}
                       error={errors.location}
@@ -250,7 +328,7 @@ export default function AddProject() {
                   <div>
                     <Input
                       label="احداثي الارض (خط العرض)"
-                      {...register("coordinates.lng", {
+                      {...register("coordinates[lng]", {
                         required: "احداثي ارض المشروع مطلوب",
                       })}
                       error={errors.location}
@@ -278,7 +356,7 @@ export default function AddProject() {
                       <div className="col-span-full">
                         <Input
                           label="التكلفة التقديرية (القيمة)"
-                          {...register("estimatedCost.value", {
+                          {...register("estimatedCost[value]", {
                             required: "التكلفة التقديرية (القيمة) مطلوبة",
                           })}
                           error={errors.estimatedCost?.value}
@@ -293,7 +371,7 @@ export default function AddProject() {
                           id="estimatedCost.file"
                           multiple
                           {...register("estimatedCost.file", {
-                            required: true,
+                            required: mode === "create",
                           })}
                         />
                       </div>
@@ -303,7 +381,7 @@ export default function AddProject() {
                           id="securityApprovalFile"
                           multiple
                           {...register("securityApprovalFile", {
-                            required: true,
+                            required: mode === "create",
                           })}
                         />
                       </div>
@@ -341,7 +419,7 @@ export default function AddProject() {
 
               <div
                 onClick={() => setIsUnitModalOpen(true)}
-                className="border rounded px-3 py-2 cursor-pointer bg-gray-50 hover:bg-gray-100"
+                className="border rounded px-3 py-2 cursor-pointer "
               >
                 {selectedUnit?.name || "اختر الوحدة التابع لها"}
               </div>
@@ -355,7 +433,9 @@ export default function AddProject() {
 
             {/* Submit Button */}
             <div className="mt-4">
-              <Button type="submit">حفظ</Button>
+              <Button type="submit">
+                {mode === "create" ? "حفظ" : "تحديث"}
+              </Button>
             </div>
           </form>
         </div>

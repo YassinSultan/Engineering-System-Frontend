@@ -226,7 +226,7 @@ export default function Project() {
             </NavLink>
           </Can>
           <Can action="users:update">
-            <NavLink to={`/users/update/${row.original._id}`}>
+            <NavLink to={`/projects/update/${row.original._id}`}>
               <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
                 <BiEdit className="w-4 h-4" />
               </button>
