@@ -16,6 +16,7 @@ import { BsEye } from "react-icons/bs";
 import { BiEdit } from "react-icons/bi";
 import formatDate from "../../../utils/formatDate";
 import AppSelect from "../../ui/AppSelect/AppSelect";
+import { filterFns } from "@tanstack/react-table";
 
 export default function Project() {
   const [tab, setTab] = useState("");
@@ -29,6 +30,7 @@ export default function Project() {
   const [searchField, setSearchField] = useState("all"); // default field
   const [searchString, setSearchString] = useState(""); //filter Search
   const [globalFilter, setGlobalFilter] = useState(""); //real filter after user click button or select suggestion
+  const [columnFilters, setColumnFilters] = useState([]);
   const [sorting, setSorting] = useState([]);
   const navigate = useNavigate();
   const {
@@ -44,6 +46,7 @@ export default function Project() {
       sorting,
       tab,
       status,
+      columnFilters,
     ],
     queryFn: () =>
       getProjects({
@@ -55,6 +58,13 @@ export default function Project() {
         filters: JSON.stringify({
           contractingParty: tab,
           status: status.value,
+          ...columnFilters.reduce((acc, filter) => {
+            acc[filter.id] =
+              typeof filter.value === "object" && filter.value !== null
+                ? filter.value.value // في حالة Select
+                : filter.value; // في حالة primitive
+            return acc;
+          }, {}),
         }),
       }),
     onSuccess: () => {
@@ -133,6 +143,10 @@ export default function Project() {
           {row.original.name}
         </span>
       ),
+      filterFn: (row, id, value) => row.getValue(id).includes(value),
+      meta: {
+        filterType: "text",
+      },
     },
     {
       id: "status",
@@ -155,6 +169,23 @@ export default function Project() {
             : "منهي"}
         </span>
       ),
+      meta: {
+        filterType: "select",
+        options: [
+          {
+            value: "STUDY",
+            label: "دراسة",
+          },
+          {
+            value: "ONGOING",
+            label: "جاري",
+          },
+          {
+            value: "FINISHED",
+            label: "منهي",
+          },
+        ],
+      },
     },
     {
       id: "contractingParty",
@@ -384,25 +415,21 @@ export default function Project() {
       </div>
       {/* Table */}
       <div>
-        {res?.data?.length > 0 ? (
-          <DataTable
-            data={res?.data || []}
-            columns={columns}
-            loading={isLoading}
-            pageCount={res?.totalPages || 0}
-            totalRecords={res?.total || 0}
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            sorting={sorting}
-            onPageChange={setPageIndex}
-            onPageSizeChange={setPageSize}
-            onSortingChange={setSorting}
-          />
-        ) : (
-          <div className="flex items-center justify-center h-40 border border-dashed border-primary-500 rounded-lg">
-            <span className="text-primary-500">لا يوجد مشاريع</span>
-          </div>
-        )}
+        <DataTable
+          data={res?.data || []}
+          columns={columns}
+          loading={isLoading}
+          pageCount={res?.totalPages || 0}
+          totalRecords={res?.total || 0}
+          pageIndex={pageIndex}
+          pageSize={pageSize}
+          sorting={sorting}
+          onPageChange={setPageIndex}
+          onPageSizeChange={setPageSize}
+          onSortingChange={setSorting}
+          columnFilters={columnFilters}
+          onColumnFiltersChange={setColumnFilters}
+        />
       </div>
     </>
   );

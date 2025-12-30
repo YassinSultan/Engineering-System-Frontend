@@ -1,4 +1,5 @@
-import React from "react";
+// DataTable.jsx
+import React, { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -13,8 +14,16 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
-import { FaArrowsUpDown } from "react-icons/fa6";
+import { FaArrowsUpDown, FaFilter } from "react-icons/fa6";
 import AppSelect from "../../ui/AppSelect/AppSelect";
+import ColumnFilter from "../ColumnFilter/ColumnFilter";
+import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  autoUpdate,
+} from "@floating-ui/react";
 
 export default function DataTable({
   data = [],
@@ -30,6 +39,8 @@ export default function DataTable({
   onSortingChange,
   columnVisibility,
   onColumnVisibilityChange,
+  columnFilters,
+  onColumnFiltersChange,
 }) {
   const table = useReactTable({
     data,
@@ -37,15 +48,35 @@ export default function DataTable({
     pageCount,
     manualPagination: true,
     manualSorting: true,
+    manualFiltering: true,
     state: {
       pagination: { pageIndex, pageSize },
       sorting,
       columnVisibility,
+      columnFilters,
     },
     onColumnVisibilityChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange,
   });
+
+  const [activeFilterColumnId, setActiveFilterColumnId] = useState(null);
+
+  // One floating per filter button (we use the same instance but update reference)
+  const { refs, floatingStyles } = useFloating({
+    placement: "bottom-start",
+    middleware: [offset(10), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+    strategy: "fixed",
+  });
+
+  const toggleFilter = (columnId) => (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    setActiveFilterColumnId((prev) => (prev === columnId ? null : columnId));
+  };
 
   const handleSort = (columnId) => {
     const currentSort = sorting.find((s) => s.id === columnId);
@@ -85,21 +116,76 @@ export default function DataTable({
                 {headerGroup.headers.map((header) => {
                   const canSort =
                     header.column.columnDef.enableSorting !== false;
+                  const canFilter =
+                    header.column.columnDef.enableFilter !== false;
+
+                  const isFilterOpen =
+                    activeFilterColumnId === header.column.id;
+
                   return (
                     <th
                       key={`${header.column.id}-${header.depth}`}
                       className={cn(
-                        "px-4 py-3.5 font-semibold text-center whitespace-nowrap transition-colors bg-primary-500 text-primary-content-500",
-                        canSort && "cursor-pointer hover:bg-primary-500/80"
+                        "px-4 py-3.5 font-semibold text-center whitespace-nowrap transition-colors",
+                        "bg-primary-500 text-primary-content-500",
+                        canSort && "cursor-pointer hover:bg-primary-600"
                       )}
                       onClick={() => canSort && handleSort(header.column.id)}
                     >
-                      <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center justify-center gap-2 relative">
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
+
                         {canSort && getSortIcon(header.column.id)}
+
+                        {canFilter && (
+                          <button
+                            ref={isFilterOpen ? refs.setReference : null}
+                            onClick={toggleFilter(header.column.id)}
+                            className={cn(
+                              "p-1.5 rounded transition-colors relative",
+                              header.column.getFilterValue()
+                                ? "text-primary bg-primary/30 border border-primary/50"
+                                : "text-muted-foreground hover:text-foreground hover:bg-accent/70"
+                            )}
+                            title="تصفية العمود"
+                          >
+                            <FaFilter className="w-3.5 h-3.5" />
+
+                            {header.column.getIsFiltered() && (
+                              <span
+                                className="
+                                  absolute -top-1 -right-1 
+                                  flex h-4 w-4 
+                                  items-center justify-center 
+                                  rounded-full bg-red-500 
+                                  text-[10px] font-bold text-white
+                                  ring-2 ring-white dark:ring-gray-900
+                                "
+                              >
+                                •
+                              </span>
+                            )}
+                          </button>
+                        )}
+
+                        {isFilterOpen && (
+                          <div
+                            ref={refs.setFloating}
+                            style={{
+                              ...floatingStyles,
+                              position: "fixed", // ← تأكيد إضافي (مهم جداً)
+                              zIndex: 9999,
+                            }}
+                          >
+                            <ColumnFilter
+                              column={header.column}
+                              onClose={() => setActiveFilterColumnId(null)}
+                            />
+                          </div>
+                        )}
                       </div>
                     </th>
                   );
