@@ -82,6 +82,10 @@ export default function AppSelect({
       boxShadow: "none",
       alignItems: "center",
     }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 99999, // الرقم العالي هنا
+    }),
 
     valueContainer: (base) => ({
       ...base,
