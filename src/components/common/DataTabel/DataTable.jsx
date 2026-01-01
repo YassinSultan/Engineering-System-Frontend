@@ -14,7 +14,7 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
-import { FaArrowsUpDown, FaFilter } from "react-icons/fa6";
+import { FaArrowsUpDown, FaFilter, FaX } from "react-icons/fa6";
 import AppSelect from "../../ui/AppSelect/AppSelect";
 import ColumnFilter from "../ColumnFilter/ColumnFilter";
 import {
@@ -65,8 +65,8 @@ export default function DataTable({
 
   // One floating per filter button (we use the same instance but update reference)
   const { refs, floatingStyles } = useFloating({
-    placement: "bottom-start",
-    middleware: [offset(10), flip(), shift()],
+    placement: "bottom-center",
+    middleware: [offset(10), flip(), shift({ padding: 10 })],
     whileElementsMounted: autoUpdate,
     strategy: "fixed",
   });
@@ -106,8 +106,83 @@ export default function DataTable({
   const startRecord = totalRecords > 0 ? pageIndex * pageSize + 1 : 0;
   const endRecord = Math.min((pageIndex + 1) * pageSize, totalRecords);
 
+  const getFilterDisplayValue = (column) => {
+    const value = column.getFilterValue();
+    if (!value) return null;
+
+    const meta = column.columnDef.meta || {};
+    const filterType = meta.filterType || "text";
+
+    if (filterType === "dateRange") {
+      return value.start && value.end
+        ? `${value.start} → ${value.end}`
+        : value.start || value.end || "";
+    }
+
+    if (filterType === "select" || filterType === "asyncSelect") {
+      return value?.label || value?.value || String(value);
+    }
+
+    return String(value).trim();
+  };
+  const activeFilters = table
+    .getState()
+    .columnFilters.map((f) => {
+      const column = table.getColumn(f.id);
+      if (!column) return null;
+      const displayValue = getFilterDisplayValue(column);
+      return displayValue
+        ? { id: f.id, label: column.columnDef.header, value: displayValue }
+        : null;
+    })
+    .filter(Boolean);
+  const handleClearAllFilters = () => {
+    table.setColumnFilters([]);
+  };
+  const handleClearSingleFilter = (columnId) => {
+    table.setColumnFilters((old) => old.filter((f) => f.id !== columnId));
+  };
   return (
     <div className="table-container bg-card">
+      {/* Active Filters Display */}
+      {activeFilters.length > 0 && (
+        <div className="bg-muted/40 px-4 py-3 mb-4 bg-base roun-lg">
+          <div className="flex items-center justify-between mb-2">
+            <h6 className="text-sm font-semibold">
+              عوامل التصفية الحالية ({activeFilters.length})
+            </h6>
+            <button
+              onClick={handleClearAllFilters}
+              className="text-xs bg-red-600 text-white px-3 py-1.5 rounded-full hover:opacity-60 
+                       flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <span>مسح الكل</span>
+              <FaX size={10} />
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {activeFilters.map((filter) => (
+              <div
+                key={filter.id}
+                className="bg-primary-500/10 border border-primary-500 text-primary text-xs px-3 py-1.5 
+                         rounded-full flex items-center gap-2"
+              >
+                <span className="font-medium">{filter.label}:</span>
+                <span className="text-primary/80">{filter.value}</span>
+                <button
+                  onClick={() => handleClearSingleFilter(filter.id)}
+                  className="text-primary/70 hover:text-primary 
+                           rounded-full p-0.5 hover:bg-primary/10 transition-colors"
+                  title="إزالة هذا التصفية"
+                >
+                  <FaX />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="w-full overflow-auto rounded-lg">
         <table className="w-full min-w-max text-sm text-nowrap">
           <thead className="bg-table-header text-table-header-foreground">
