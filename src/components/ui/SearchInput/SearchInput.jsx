@@ -1,5 +1,4 @@
-// SearchInput.jsx
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   AsyncPaginate,
   reduceGroupedOptions,
@@ -10,12 +9,33 @@ import { FaSearch } from "react-icons/fa";
 export default function SearchInput({
   type = "global",
   model = "projects",
-  column, // used only when type === "column"
+  column, // only used when type === "column"
   onSelect,
   placeholder = "بحث...",
-  value,
+  value: externalValue,
+  allowFreeText = true,
+  className = "",
+  ...rest
 }) {
   const [inputValue, setInputValue] = useState("");
+
+  // Normalize external value to always be {label, value} or null
+  const normalizedValue = useMemo(() => {
+    if (!externalValue) return null;
+
+    if (typeof externalValue === "string") {
+      return { label: externalValue, value: externalValue };
+    }
+
+    if (externalValue?.label && externalValue?.value !== undefined) {
+      return externalValue;
+    }
+
+    // fallback — أي شيء آخر نحوله لـ string
+    const str = String(externalValue);
+    return { label: str, value: str };
+  }, [externalValue]);
+
   const loadOptions = async (search, prevOptions, { page }) => {
     if (!search?.trim()) {
       return {
@@ -34,6 +54,7 @@ export default function SearchInput({
         page,
         limit: type === "global" ? 10 : 8,
       });
+
       return {
         options: response.options || [],
         hasMore: !!response.hasMore,
@@ -51,68 +72,109 @@ export default function SearchInput({
     }
   };
 
+  const handleChange = (option) => {
+    onSelect?.(option); // يمكن أن يكون null إذا تم المسح
+  };
+
+  const handleInputChange = (val) => {
+    setInputValue(val);
+    // إذا كان free text مسموح ولم يكن هناك خيار مختار → نحدّث القيمة مباشرة
+    if (allowFreeText && !normalizedValue) {
+      onSelect?.(val.trim() ? { label: val.trim(), value: val.trim() } : null);
+    }
+  };
+
   const customStyles = {
-    control: (base) => ({
+    control: (base, state) => ({
       ...base,
       minHeight: "48px",
       borderRadius: "8px",
-      borderColor: "#d1d5db",
+      borderColor: state.isFocused
+        ? "var(--color-primary-500)"
+        : "var(--color-primary-200)",
       boxShadow: "none",
-      "&:hover": { borderColor: "#9ca3af" },
-      padding: "0 30px 0px 0px",
+      "&:hover": { borderColor: "var(--color-primary-500)" },
+      paddingRight: "2.5rem", // للأيقونة
+      backgroundColor: "transparent",
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: "inherit", // يمنع الغمقان
+      fontWeight: "normal", // لو كان Bold
     }),
     valueContainer: (base) => ({
       ...base,
-      padding: "0 10px",
+      padding: "0 0.5rem",
+      color: "inherit",
     }),
     input: (base) => ({
       ...base,
       margin: 0,
       padding: 0,
+      color: "inherit",
     }),
     menu: (base) => ({
       ...base,
       borderRadius: "8px",
-      marginTop: 4,
+      marginTop: "0.8rem",
       boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+      backgroundColor: "var(--color-base)",
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected
+        ? "var(--color-primary-500)"
+        : state.isFocused
+        ? "var(--color-primary-500)"
+        : "transparent",
+
+      color: state.isSelected
+        ? "var(--color-primary-content-500)"
+        : state.isFocused
+        ? "var(--color-primary-content-500)"
+        : "inherit",
     }),
   };
 
   return (
-    <div className="relative w-full sm:max-w-md md:max-w-lg lg:max-w-xl">
-      <div className="p-2 absolute z-1 top-1/2 -translate-y-1/2 border-e border-gray-300">
+    <div className={`relative w-full ${className}`}>
+      {/* Search Icon */}
+      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none z-10 border-e border-primary-200 pe-2">
         <FaSearch size={15} className="text-primary-500" />
       </div>
+
       <AsyncPaginate
-        reduceOptions={reduceGroupedOptions}
-        cacheOptions
+        value={normalizedValue}
+        inputValue={inputValue}
+        onInputChange={handleInputChange}
+        onChange={handleChange}
         loadOptions={loadOptions}
         additional={{ page: 1 }}
         placeholder={placeholder}
-        debounceTimeout={350}
-        value={
-          value ||
-          (inputValue ? { label: inputValue, value: inputValue } : null)
-        }
-        onChange={onSelect}
-        onInputChange={(val) => setInputValue(val)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && inputValue.trim()) {
-            e.preventDefault();
-            onSelect({ label: inputValue, value: inputValue });
-          }
-        }}
-        closeMenuOnSelect
-        isClearable
-        isSearchable
-        components={{
-          DropdownIndicator: () => null,
-          IndicatorSeparator: () => null,
-        }}
+        debounceTimeout={100}
+        reduceOptions={reduceGroupedOptions}
+        cacheOptions
+        closeMenuOnSelect={true}
+        isClearable={true}
+        isSearchable={true}
         styles={customStyles}
         noOptionsMessage={() => "لا توجد نتائج مطابقة"}
         loadingMessage={() => "جاري البحث..."}
         errorMessage={() => "حدث خطأ أثناء جلب الاقتراحات"}
+        components={{
+          DropdownIndicator: () => null,
+          IndicatorSeparator: () => null,
+        }}
+        // دعم الكتابة اليدوية + Enter
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && inputValue.trim() && allowFreeText) {
+            e.preventDefault();
+            const trimmed = inputValue.trim();
+            onSelect?.({ label: trimmed, value: trimmed });
+            setInputValue("");
+          }
+        }}
+        {...rest}
       />
     </div>
   );

@@ -312,8 +312,8 @@ export default function DataTable({
                   className={cn(
                     "hover:bg-primary-200 hover:text-primary-content-200 transition-colors",
                     index % 2 === 0
-                      ? "bg-primary-50 text-primary-content-50"
-                      : "bg-primary-50/30"
+                      ? "bg-primary-50 text-primary-content-50 dark:bg-primary-800 dark:text-primary-content-800"
+                      : "bg-primary-100 text-primary-content-100 dark:bg-primary-900 dark:text-primary-content-900"
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
