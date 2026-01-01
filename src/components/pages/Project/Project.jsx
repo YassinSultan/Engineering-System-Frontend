@@ -325,6 +325,7 @@ export default function Project() {
         {/* search */}
 
         <SearchInput
+          className="max-w-xl"
           type="global"
           model="projects"
           onSelect={(selectedOption) => {
