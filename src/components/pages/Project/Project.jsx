@@ -3,36 +3,26 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { getProjects } from "../../../api/projectApi";
 import toast from "react-hot-toast";
-import Swal from "sweetalert2";
 import SearchInput from "../../ui/SearchInput/SearchInput";
-import Loading from "../../common/Loading/Loading";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Button from "../../ui/Button/Button";
 import Can from "../../common/Can/Can";
-import { FaKeycdn, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { FiRefreshCcw } from "react-icons/fi";
 import DataTable from "../../common/DataTabel/DataTable";
 import { BsEye } from "react-icons/bs";
 import { BiEdit } from "react-icons/bi";
 import formatDate from "../../../utils/formatDate";
-import AppSelect from "../../ui/AppSelect/AppSelect";
-import { filterFns } from "@tanstack/react-table";
 
 export default function Project() {
-  const [tab, setTab] = useState("");
-  const [status, setStatus] = useState({
-    value: "",
-    label: "الكل",
-  });
-  console.log(status);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [searchField, setSearchField] = useState("all"); // default field
-  const [searchString, setSearchString] = useState(""); //filter Search
-  const [globalFilter, setGlobalFilter] = useState(""); //real filter after user click button or select suggestion
+  const [globalSearchValue, setGlobalSearchValue] = useState(null);
   const [columnFilters, setColumnFilters] = useState([]);
   const [sorting, setSorting] = useState([]);
   const navigate = useNavigate();
+  console.log("columnFilters", columnFilters);
+
   const {
     data: res,
     isLoading,
@@ -42,30 +32,23 @@ export default function Project() {
       "projects",
       pageIndex,
       pageSize,
-      globalFilter,
+      globalSearchValue?.value,
       sorting,
-      tab,
-      status,
       columnFilters,
     ],
     queryFn: () =>
       getProjects({
         page: pageIndex + 1,
         limit: pageSize,
-        search: globalFilter,
+        search: globalSearchValue?.value || undefined,
         sortBy: sorting[0]?.id || "createdAt",
         sortOrder: sorting[0]?.desc ? "desc" : "asc",
-        filters: JSON.stringify({
-          contractingParty: tab,
-          status: status.value,
-          ...columnFilters.reduce((acc, filter) => {
-            acc[filter.id] =
-              typeof filter.value === "object" && filter.value !== null
-                ? filter.value.value // في حالة Select
-                : filter.value; // في حالة primitive
+        filters: JSON.stringify(
+          columnFilters.reduce((acc, f) => {
+            if (f.value) acc[f.id] = f.value;
             return acc;
-          }, {}),
-        }),
+          }, {})
+        ),
       }),
     onSuccess: () => {
       console.log(res);
@@ -145,7 +128,8 @@ export default function Project() {
       ),
       filterFn: (row, id, value) => row.getValue(id).includes(value),
       meta: {
-        filterType: "text",
+        filterType: "search",
+        model: "projects",
       },
     },
     {
@@ -208,6 +192,23 @@ export default function Project() {
             : "جهة موازنة"}
         </span>
       ),
+      meta: {
+        filterType: "select",
+        options: [
+          {
+            value: "CIVILIAN",
+            label: "جهة مدنية",
+          },
+          {
+            value: "MILITARY",
+            label: "جهة عسكرية",
+          },
+          {
+            value: "BUDGET",
+            label: "جهة موازنة",
+          },
+        ],
+      },
     },
     {
       id: "code",
@@ -216,11 +217,18 @@ export default function Project() {
       cell: ({ row }) => (
         <span className="text-xs px-2 py-1">{row.original.code}</span>
       ),
+      meta: {
+        filterType: "search",
+        model: "projects",
+      },
     },
     {
       id: "startDate",
       header: "تاريخ بدء المشروع",
       accessorKey: "startDate",
+      meta: {
+        filterType: "date",
+      },
       cell: ({ row }) => (
         <span className="text-xs px-2 py-1">
           {formatDate(row.original.startDate)}
@@ -234,6 +242,10 @@ export default function Project() {
       cell: ({ row }) => (
         <span className="text-xs px-2 py-1">{row.original.location}</span>
       ),
+      meta: {
+        filterType: "search",
+        model: "projects",
+      },
     },
     {
       id: "landArea",
@@ -242,11 +254,16 @@ export default function Project() {
       cell: ({ row }) => (
         <span className="text-xs px-2 py-1 ">{row.original.landArea}</span>
       ),
+      meta: {
+        filterType: "number",
+        model: "projects",
+      },
     },
     {
       id: "actions",
       header: "الإجراءات",
       enableSorting: false,
+      enableFilter: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
           <Can action="projects:read">
@@ -304,114 +321,29 @@ export default function Project() {
           </Can>
         </div>
       </div>
-      <div className="flex items-center justify-between py-2 px-4 bg-base my-4 rounded-xl">
+      <div className="flex items-center justify-between py-2 px-4 bg-base my-4 rounded-xl gap-3">
         {/* search */}
-        <div className="w-1/4 border-e border-gray-400 pe-4 me-4">
-          <SearchInput
-            // fields={fields}
-            // suggestions={suggestions}
-            selectedField={searchField}
-            onChangeText={setSearchString}
-            onSelectSuggestion={(value) => setGlobalFilter(value)}
-            onSearchFieldChange={(value) => {
-              setSearchField(value);
-              setSearchString("");
-            }}
-          />
-        </div>
-        {/* another filters */}
-        <div className="flex flex-1 justify-between gap-4 items-center">
-          <div className="flex gap-2 flex-1 items-center">
-            {/* tab */}
-            <div>
-              <span className="text-xs px-2 py-1 block">جهة التعاقد</span>
-              <div
-                className="inline-flex rounded-lg shadow-xs -space-x-px bg-primary-100 text-primary-content-100 p-2"
-                role="group"
-              >
-                <button
-                  onClick={() => setTab("CIVILIAN")}
-                  type="button"
-                  className={`px-4 py-1 rounded-md cursor-pointer ${
-                    tab === "CIVILIAN"
-                      ? "bg-primary-500 text-primary-content-500"
-                      : ""
-                  }`}
-                >
-                  جهة مدنية
-                </button>
-                <button
-                  onClick={() => setTab("MILITARY")}
-                  type="button"
-                  className={`px-4 py-1 rounded-md cursor-pointer ${
-                    tab === "MILITARY"
-                      ? "bg-primary-500 text-primary-content-500"
-                      : ""
-                  }`}
-                >
-                  جهة عسكرية
-                </button>
-                <button
-                  onClick={() => setTab("BUDGET")}
-                  type="button"
-                  className={`px-4 py-1 rounded-md cursor-pointer ${
-                    tab === "BUDGET"
-                      ? "bg-primary-500 text-primary-content-500"
-                      : ""
-                  }`}
-                >
-                  جهة موازنة
-                </button>
-                <button
-                  onClick={() => setTab("")}
-                  type="button"
-                  className={`px-4 py-1 rounded-md cursor-pointer ${
-                    tab === "" ? "bg-primary-500 text-primary-content-500" : ""
-                  }`}
-                >
-                  الكل
-                </button>
-              </div>
-            </div>
-            {/* statue */}
-            <div className="w-40">
-              <span className="text-xs px-2 py-1">حالة المشروع</span>
-              <AppSelect
-                options={[
-                  {
-                    value: "",
-                    label: "الكل",
-                  },
-                  {
-                    value: "STUDY",
-                    label: "دراسة",
-                  },
-                  {
-                    value: "ONGOING",
-                    label: "جاري",
-                  },
-                  {
-                    value: "FINISHED",
-                    label: "منتهي",
-                  },
-                ]}
-                label=""
-                value={status}
-                onChange={setStatus}
-                isClearable={false}
-              />
-            </div>
-          </div>
 
-          {/* refresh button */}
-          <Button
-            disabled={isLoading}
-            onClick={() => refetch()}
-            className="h-fit"
-          >
-            <FiRefreshCcw className={`${isLoading ? "animate-spin" : ""}`} />
-          </Button>
-        </div>
+        <SearchInput
+          type="global"
+          model="projects"
+          onSelect={(selectedOption) => {
+            console.log(selectedOption);
+            setGlobalSearchValue(selectedOption); // full object
+            setPageIndex(0); // reset to page 1
+          }}
+          value={globalSearchValue || ""}
+          placeholder="ابحث عن اسم المشروع، الكود، الموقع..."
+        />
+
+        {/* refresh button */}
+        <Button
+          disabled={isLoading}
+          onClick={() => refetch()}
+          className="h-fit"
+        >
+          <FiRefreshCcw className={`${isLoading ? "animate-spin" : ""}`} />
+        </Button>
       </div>
       {/* Table */}
       <div>
