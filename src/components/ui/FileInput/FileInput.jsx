@@ -42,8 +42,8 @@ const FileInput = forwardRef(
       <div className="w-full my-2">
         <p>{label}</p>
         {/* Upload Box */}
-        <div className="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border border-dashed rounded-lg">
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+        <div className="flex flex-col items-center justify-center w-full h-fit bg-neutral-secondary-medium border border-dashed rounded-lg">
+          <div className="flex flex-col items-center justify-center p-3">
             <svg
               className="w-8 h-8 mb-4"
               aria-hidden="true"

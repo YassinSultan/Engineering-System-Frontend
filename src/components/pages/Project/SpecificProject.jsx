@@ -130,16 +130,24 @@ export default function SpecificProject() {
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="icon">
-                <TbCrosshair />
+            <div className="flex flex-col gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <TbCrosshair className="text-xl" />
+                <h6 className="font-light">إحداثيات الأرض (e,n)</h6>
               </div>
-              <div>
-                <h6 className="font-light">احداثي الارض </h6>
-                <span className="font-bold">
-                  {data.coordinates.lng || "----"} ,{" "}
-                  {data.coordinates.lat || "----"}
-                </span>
+
+              <div className="grid grid-cols-1 gap-4">
+                {data.coordinates.map((coord, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-2 bg-background/50 rounded shadow-sm"
+                  >
+                    <span className="font-semibold">نقطة {index + 1}</span>
+                    <span>
+                      {coord.e}, {coord.n}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
             {data.fiscalYear && (

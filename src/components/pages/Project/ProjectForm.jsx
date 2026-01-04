@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PageTitle from "../../ui/PageTitle/PageTitle";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import AppSelect from "../../ui/AppSelect/AppSelect";
 import Input from "../../ui/Input/Input";
 import Button from "../../ui/Button/Button";
@@ -16,8 +16,11 @@ import {
 import toast from "react-hot-toast";
 import { useParams } from "react-router";
 import Loading from "../../common/Loading/Loading";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function ProjectForm({ mode = "create" }) {
+  const { user } = useAuth();
+  console.log(user);
   const { id } = useParams();
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const isUpdate = mode === "update";
@@ -35,7 +38,20 @@ export default function ProjectForm({ mode = "create" }) {
     formState: { errors },
     setValue,
   } = useForm({
-    defaultValues: isUpdate ? data : {},
+    defaultValues: isUpdate
+      ? data
+      : {
+          coordinates: [
+            { e: 0, n: 0 },
+            { e: 0, n: 0 },
+            { e: 0, n: 0 },
+            { e: 0, n: 0 },
+          ],
+        },
+  });
+  const { fields: coordinatesFields } = useFieldArray({
+    control,
+    name: "coordinates",
   });
   const contractingParty = useWatch({
     control,
@@ -64,6 +80,7 @@ export default function ProjectForm({ mode = "create" }) {
     },
   });
   const onSubmit = (data) => {
+    console.log("data", data);
     const getNestedValue = (obj, path) =>
       path
         .replace(/\[(\w+)\]/g, ".$1")
@@ -76,8 +93,6 @@ export default function ProjectForm({ mode = "create" }) {
       "code",
       "startDate",
       "location",
-      "coordinates[lat]",
-      "coordinates[lng]",
       "landArea",
       "fiscalYear",
       "estimatedCost[value]",
@@ -117,7 +132,12 @@ export default function ProjectForm({ mode = "create" }) {
     if (data.status?.value) {
       formData.append("status", data.status.value);
     }
-
+    if (data.coordinates) {
+      data.coordinates.forEach((c, i) => {
+        formData.append(`coordinates[${i}][e]`, c.e);
+        formData.append(`coordinates[${i}][n]`, c.n);
+      });
+    }
     // print form data label values
     console.log("form data");
     for (const pair of formData.entries()) {
@@ -313,29 +333,30 @@ export default function ProjectForm({ mode = "create" }) {
                   />
                 </div>
               </div>
-              <div className="col-span-full">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  <div>
+              <div className="col-span-full border p-4 rounded-xl">
+                <h6 className="mb-4">احداثي الارض</h6>
+                {coordinatesFields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3"
+                  >
                     <Input
-                      label="احداثي الارض (خط الطول)"
-                      {...register("coordinates[lat]", {
-                        required: "احداثي ارض المشروع مطلوب",
+                      label={`الزاوية ${index + 1} - الإحداثي الشرقي (E)`}
+                      {...register(`coordinates.${index}.e`, {
+                        valueAsNumber: true,
+                        required: true,
                       })}
-                      error={errors.location}
-                      rules={{ required: "احداثي ارض المشروع مطلوب" }}
+                    />
+
+                    <Input
+                      label={`الزاوية ${index + 1} - الإحداثي الشرقي (E)`}
+                      {...register(`coordinates.${index}.n`, {
+                        valueAsNumber: true,
+                        required: true,
+                      })}
                     />
                   </div>
-                  <div>
-                    <Input
-                      label="احداثي الارض (خط العرض)"
-                      {...register("coordinates[lng]", {
-                        required: "احداثي ارض المشروع مطلوب",
-                      })}
-                      error={errors.location}
-                      rules={{ required: "احداثي ارض المشروع مطلوب" }}
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
               {contractingParty?.value === "BUDGET" && (
                 <div>
