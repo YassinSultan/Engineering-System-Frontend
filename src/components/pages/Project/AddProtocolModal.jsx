@@ -19,6 +19,11 @@ import {
 } from "../../../api/cashFlowAPI.js";
 import { LuLoader } from "react-icons/lu";
 import Swal from "sweetalert2";
+import {
+  createPaymentOrder,
+  deletePaymentOrder,
+  updatePaymentOrder,
+} from "../../../api/paymentOrder.js";
 
 export default function AddProtocolModal({
   projectID,
@@ -34,7 +39,6 @@ export default function AddProtocolModal({
   const protocolID = mode === "update" ? initialData?.id : createdProtocolID;
 
   const isUpdateMode = mode === "update";
-  console.log(initialData);
   const {
     control,
     register,
@@ -82,12 +86,22 @@ export default function AddProtocolModal({
           incentivesPercentage: "",
           laborDepreciationPercentage: "",
           generalSurplusPercentage: "",
+          paymentOrders: [{ number: "", value: "", date: "", file: "" }],
         },
   });
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "cashFlows",
+  });
+
+  const {
+    fields: paymentOrderFields,
+    append: paymentOrderAppend,
+    remove: paymentOrderRemove,
+  } = useFieldArray({
+    control,
+    name: "paymentOrders",
   });
 
   const urgent = Number(
@@ -140,6 +154,29 @@ export default function AddProtocolModal({
     },
   });
 
+  const { mutateAsync: createPaymentOrderMutate } = useMutation({
+    mutationFn: createPaymentOrder,
+    onSuccess: () => {
+      toast.success("تم اضافة اوامر الدفع");
+    },
+  });
+  const { mutateAsync: updatePaymentOrderMutate } = useMutation({
+    mutationFn: updatePaymentOrder,
+    onSuccess: () => {
+      toast.success("تم تعديل امر الدفع");
+    },
+    onError: () => {
+      toast.error("حدث خطاء اثناء تعديل امر الدفع");
+    },
+  });
+  const { mutateAsync: deletePaymentOrderMutate } = useMutation({
+    mutationFn: deletePaymentOrder,
+    onSuccess: () => {
+      toast.success("تم حذف  امر الدفع");
+      queryClient.invalidateQueries(["protocol", protocolID]);
+    },
+  });
+
   const { mutate: createPlanningBudgetMutate, isPending: creatingBudget } =
     useMutation({
       mutationFn: createPlanningBudget,
@@ -154,7 +191,7 @@ export default function AddProtocolModal({
       mutationFn: updatePlanningBudget,
       onSuccess: () => {
         toast.success("تم تعديل الموازنة التخطيطية بنجاح");
-        handleSuccessClose();
+        setStep(4);
       },
     });
 
@@ -187,6 +224,33 @@ export default function AddProtocolModal({
     } catch (error) {
       // toast already handled in onError
       console.error("Delete cash flow error:", error);
+    }
+  };
+  const handleDeletePaymentOrder = async (index, paymentOrder) => {
+    if (!paymentOrder.paymentOrderID) {
+      paymentOrderRemove(index);
+      toast("تم إزالة التدفق الجديد", { icon: "ℹ️" });
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "هل أنت متأكد؟",
+      text: "سيتم حذف امر الدفع نهائياً",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      cancelButtonText: "إلغاء",
+      confirmButtonText: "نعم، احذف",
+    });
+
+    if (!result.isConfirmed) return;
+    try {
+      await deletePaymentOrderMutate(paymentOrder.paymentOrderID);
+      paymentOrderRemove(index);
+    } catch (error) {
+      // toast already handled in onError
+      console.error("Delete payment order error:", error);
     }
   };
   const onSubmit = async (data) => {
@@ -263,6 +327,36 @@ export default function AddProtocolModal({
           createPlanningBudgetMutate(budgetData);
         }
       }
+      // Step 4: Payment Orders
+      if (step === 4) {
+        const promises = [];
+        console.log(data.paymentOrders);
+        // Handle each cash flow
+        for (const paymentOrder of data.paymentOrders) {
+          console.log(paymentOrder.file[0]);
+          const payload = {
+            number: Number(paymentOrder.number),
+            value: Number(paymentOrder.value),
+            date: paymentOrder.date,
+            file: paymentOrder.file[0],
+            protocol: protocolID,
+          };
+          console.log(paymentOrder);
+          if (paymentOrder.paymentOrderID) {
+            await updatePaymentOrderMutate({
+              id: paymentOrder.paymentOrderID,
+              data: payload,
+            });
+          } else {
+            await createPaymentOrderMutate(payload);
+          }
+        }
+
+        await Promise.all(promises);
+        toast.success("تم حفظ  اوامر الدفع بنجاح");
+        handleClose();
+        return;
+      }
     } catch (err) {
       console.error(err);
       toast.error("حدث خطأ أثناء الحفظ");
@@ -297,6 +391,15 @@ export default function AddProtocolModal({
               withdrawalPercentage: cf.withdrawalPercentage || "",
             }))
           : [{ notes: "", completionPercentage: "", withdrawalPercentage: "" }],
+        paymentOrders: initialData.paymentOrders?.length
+          ? initialData.paymentOrders.map((cf) => ({
+              paymentOrderID: cf._id,
+              number: cf.number || "",
+              value: cf.value || "",
+              date: cf.date.split("T")[0] || "",
+              file: [],
+            }))
+          : [{ number: "", value: "", date: "", file: [] }],
         urgentWorksPercentage:
           initialData.planningBudget?.urgentWorksPercentage || "",
         incentivesPercentage:
@@ -314,6 +417,7 @@ export default function AddProtocolModal({
         cashFlows: [
           { notes: "", completionPercentage: "", withdrawalPercentage: "" },
         ],
+        paymentOrders: [{ number: "", value: "", date: "", file: [] }],
         urgentWorksPercentage: "",
         incentivesPercentage: "",
         laborDepreciationPercentage: "",
@@ -339,10 +443,14 @@ export default function AddProtocolModal({
           <div className="mb-4">
             <ol className="flex items-center w-full p-3 space-x-2 text-sm font-medium text-center text-body bg-primary-100 text-primary-content-100/60 dark:bg-primary-800 dark:text-primary-content-800/60 border border-primary-500 rounded-lg shadow-xs sm:p-4 sm:space-x-4">
               <li
+                onClick={() => {
+                  if (isUpdateMode && step !== 1) setStep(1);
+                }}
                 className={`flex items-center ${
                   step === 1 &&
                   "text-primary-content-100 dark:text-primary-content-800"
-                }`}
+                }
+                 ${step !== 1 && isUpdateMode && "cursor-pointer"}`}
               >
                 <span className="flex items-center justify-center w-5 h-5 me-2 text-xs border border-brand rounded-full shrink-0">
                   1
@@ -370,10 +478,14 @@ export default function AddProtocolModal({
                 </svg>
               </li>
               <li
+                onClick={() => {
+                  if (isUpdateMode && step !== 2) setStep(2);
+                }}
                 className={`flex items-center ${
                   step === 2 &&
                   "text-primary-content-100 dark:text-primary-content-800"
-                }`}
+                }
+                 ${step !== 2 && isUpdateMode && "cursor-pointer"}`}
               >
                 <span className="flex items-center justify-center w-5 h-5 me-2 text-xs border border-body rounded-full shrink-0">
                   2
@@ -401,10 +513,14 @@ export default function AddProtocolModal({
                 </svg>
               </li>
               <li
+                onClick={() => {
+                  if (isUpdateMode && step !== 3) setStep(3);
+                }}
                 className={`flex items-center ${
                   step === 3 &&
                   "text-primary-content-100 dark:text-primary-content-800"
-                }`}
+                }
+                 ${step !== 3 && isUpdateMode && "cursor-pointer"}`}
               >
                 <span className="flex items-center justify-center w-5 h-5 me-2 text-xs border border-body rounded-full shrink-0">
                   3
@@ -412,7 +528,42 @@ export default function AddProtocolModal({
                 <span className="hidden sm:inline-flex me-2">
                   {isUpdateMode ? "تعديل" : "اضافة"}
                 </span>
-                الموازنة المالية
+                الموازنة التخطيطية
+                <svg
+                  className="w-5 h-5 ms-2 rtl:rotate-180"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={24}
+                  height={24}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="m7 16 4-4-4-4m6 8 4-4-4-4"
+                  />
+                </svg>
+              </li>
+              <li
+                onClick={() => {
+                  if (isUpdateMode && step !== 4) setStep(4);
+                }}
+                className={`flex items-center ${
+                  step === 4 &&
+                  "text-primary-content-100 dark:text-primary-content-800"
+                }
+                 ${step !== 4 && isUpdateMode && "cursor-pointer"}`}
+              >
+                <span className="flex items-center justify-center w-5 h-5 me-2 text-xs border border-body rounded-full shrink-0">
+                  4
+                </span>
+                <span className="hidden sm:inline-flex me-1">
+                  {isUpdateMode ? "تعديل" : "اضافة"}
+                </span>
+                اوامر الدفع
               </li>
             </ol>
           </div>
@@ -582,7 +733,77 @@ export default function AddProtocolModal({
                 </div>
               </div>
             )}
+            {/* step 4 - Payment Order */}
+            {step === 4 && (
+              <div className="space-y-5">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold">اوامر الدفع</h3>
+                  <div className="font-light text-xs bg-primary-500 text-primary-content-500 w-6 h-6 rounded-full flex items-center justify-center">
+                    <span>{paymentOrderFields.length}</span>
+                  </div>
+                </div>
 
+                {paymentOrderFields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="border p-4 border-dashed rounded-lg"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <Input
+                        label="رقم امر الدفع"
+                        type="number"
+                        {...register(`paymentOrders.${index}.number`, {
+                          required: "رقم امر الدفع مطلوب",
+                        })}
+                        rules={{ required: true }}
+                        error={errors.paymentOrders?.[index]?.number}
+                      />
+                      <Input
+                        label="قيمة امر الدفع"
+                        type="number"
+                        {...register(`paymentOrders.${index}.value`, {
+                          required: "قيمة امر الدفع مطلوب",
+                        })}
+                        rules={{ required: true }}
+                        error={errors.paymentOrders?.[index]?.value}
+                      />
+                      <Input
+                        label="رقم امر الدفع"
+                        type="date"
+                        {...register(`paymentOrders.${index}.date`, {
+                          required: "تاريخ امر الدفع مطلوب",
+                        })}
+                        rules={{ required: true }}
+                        error={errors.paymentOrders?.[index]?.date}
+                      />
+                      <div className="col-span-full">
+                        <FileInput
+                          label="ملف امر الدفع"
+                          id={`paymentOrders.${index}.file`}
+                          accept=".pdf,.docx"
+                          {...register(`paymentOrders.${index}.file`, {
+                            required: "الملف مطلوب",
+                          })}
+                        />
+                      </div>
+                      <div>
+                        <Button
+                          type="button"
+                          variant="danger"
+                          disabled={paymentOrderFields.length === 1}
+                          onClick={() => handleDeletePaymentOrder(index, field)}
+                        >
+                          حذف
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <Button type="button" onClick={paymentOrderAppend}>
+                  اضافة
+                </Button>
+              </div>
+            )}
             {/* Navigation Buttons */}
             <div className="flex justify-between pt-6 border-t">
               <Button type="button" variant="outline" onClick={handleClose}>
@@ -603,7 +824,7 @@ export default function AddProtocolModal({
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? (
                     <LuLoader className="animate-spin" />
-                  ) : step === 3 ? (
+                  ) : step === 4 ? (
                     isUpdateMode ? (
                       "حفظ التعديلات"
                     ) : (

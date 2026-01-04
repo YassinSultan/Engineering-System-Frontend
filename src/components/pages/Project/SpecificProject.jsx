@@ -144,7 +144,7 @@ export default function SpecificProject() {
                   >
                     <span className="font-semibold">نقطة {index + 1}</span>
                     <span>
-                      {coord.e}, {coord.n}
+                      {coord.e || "----"}, {coord.n || "----"}
                     </span>
                   </div>
                 ))}

@@ -46,7 +46,7 @@ export default function ProtocolCard({ protocol, onUpdate }) {
       {/* Body */}
       <div
         className={`overflow-hidden transition-all duration-300 ${
-          isOpen ? "max-h-[1000px] p-4 pt-0" : "max-h-0"
+          isOpen ? "max-h-[2000px] p-4 pt-0" : "max-h-0"
         }`}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -88,23 +88,28 @@ export default function ProtocolCard({ protocol, onUpdate }) {
               <Info
                 label="أعمال عاجلة"
                 value={protocol.planningBudget?.urgentWorksPercentage}
+                after={"%"}
               />
               <Info
                 label="حوافز"
                 value={protocol.planningBudget?.incentivesPercentage}
+                after={"%"}
               />
               <Info
                 label="إهلاك عمالة"
                 value={protocol.planningBudget?.laborDepreciationPercentage}
+                after={"%"}
               />
               <Info
                 label="فائض عام"
                 value={protocol.planningBudget?.generalSurplusPercentage}
+                after={"%"}
               />
               <Info
                 label="الإجمالي"
                 value={protocol.planningBudget?.total}
                 className="col-span-full"
+                after={"%"}
               />
             </div>
           </div>
@@ -132,20 +137,68 @@ export default function ProtocolCard({ protocol, onUpdate }) {
               <p className="text-sm opacity-70">لا توجد تدفقات مالية</p>
             )}
           </div>
+
+          {/* paymentsOrders */}
+          <div className="rounded-md border border-primary-600 p-3 h-fit col-span-full">
+            <h6 className="mb-3 font-semibold border-b border-primary-600 pb-1">
+              اوامر الدفع
+            </h6>
+
+            {protocol.paymentOrders?.length ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {protocol.paymentOrders.map((p, index) => (
+                  <div
+                    key={index}
+                    className="rounded bg-primary-100 text-primary-content-100 p-2 dark:bg-primary-800 dark:text-primary-content-800"
+                  >
+                    <Info
+                      label="رقم امر الدفع"
+                      value={p.number}
+                      className="col-span-full"
+                    />
+                    <Info
+                      label="قيمة امر الدفع"
+                      value={p.number}
+                      className="col-span-full"
+                    />
+                    <Info
+                      label="تاريخ امر الدفع"
+                      value={p.date.split("T")[0]}
+                      className="col-span-full"
+                    />
+                    <div className="p-2 border rounded my-2 flex items-center justify-between">
+                      <span>ملف امر الدفع</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          window.open(getFileUrl(p.file), "_blank")
+                        }
+                      >
+                        <FaDownload />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm opacity-70">لا توجد اوامر دفع </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function Info({ label, value, className }) {
+function Info({ label, value, className, after }) {
   return (
     <div
       className={`flex justify-between bg-primary-100 text-primary-content-100 rounded px-2 py-1 dark:bg-primary-800 dark:text-primary-content-800 ${className}`}
     >
       <span>{label}</span>
       <span className="font-semibold">
-        {value !== undefined ? `${value}%` : "---"}
+        {value !== undefined ? `${value}${after || ""}` : "---"}
       </span>
     </div>
   );
