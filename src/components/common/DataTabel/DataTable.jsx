@@ -127,7 +127,7 @@ export default function DataTable({
   };
   const activeFilters = table
     .getState()
-    .columnFilters.map((f) => {
+    .columnFilters?.map((f) => {
       const column = table.getColumn(f.id);
       if (!column) return null;
       const displayValue = getFilterDisplayValue(column);
@@ -145,11 +145,11 @@ export default function DataTable({
   return (
     <div className="table-container bg-card">
       {/* Active Filters Display */}
-      {activeFilters.length > 0 && (
+      {activeFilters?.length > 0 && (
         <div className="bg-muted/40 px-4 py-3 mb-4 bg-base roun-lg">
           <div className="flex items-center justify-between mb-2">
             <h6 className="text-sm font-semibold">
-              عوامل التصفية الحالية ({activeFilters.length})
+              عوامل التصفية الحالية ({activeFilters?.length})
             </h6>
             <button
               onClick={handleClearAllFilters}
