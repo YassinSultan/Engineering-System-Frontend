@@ -7,7 +7,11 @@ import FileInput from "../../ui/FileInput/FileInput";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { createProtocol, updateProtocol } from "../../../api/protocolsAPI.js";
+import {
+  createProtocol,
+  updateImplementationRate,
+  updateProtocol,
+} from "../../../api/protocolsAPI.js";
 import {
   createPlanningBudget,
   updatePlanningBudget,
@@ -194,9 +198,23 @@ export default function AddProtocolModal({
         setStep(4);
       },
     });
+  const {
+    mutate: updateImplementationRateMutate,
+    isPending: updatingImplementationRate,
+  } = useMutation({
+    mutationFn: updateImplementationRate,
+    onSuccess: () => {
+      toast.success("تم تعديل نسبة التنفيذ  بنجاح");
+      setStep(2);
+    },
+  });
 
   const isLoading =
-    creatingProtocol || updatingProtocol || creatingBudget || updatingBudget;
+    creatingProtocol ||
+    updatingProtocol ||
+    creatingBudget ||
+    updatingImplementationRate ||
+    updatingBudget;
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleDeleteCashFlow = async (index, cashFlow) => {
     console.log("index", index, "cashFlow", cashFlow);
@@ -261,6 +279,8 @@ export default function AddProtocolModal({
         formData.append("name", data.name);
         formData.append("value", data.value);
         formData.append("project", projectID);
+        formData.append("currentPercentage", data.currentPercentage);
+        formData.append("currentDate", data.currentDate);
 
         if (data.file?.[0]) {
           formData.append("file", data.file[0]);
@@ -268,6 +288,16 @@ export default function AddProtocolModal({
 
         if (isUpdateMode) {
           updateProtocolMutate({ id: protocolID, formData });
+          if (data.currentPercentage !== initialData?.currentPercentage) {
+            updateImplementationRateMutate({
+              id: protocolID,
+              data: {
+                currentPercentage: data.currentPercentage,
+                currentDate:
+                  data.currentDate || new Date().toISOString().split("T")[0],
+              },
+            });
+          }
         } else {
           createProtocolMutate(formData);
         }
@@ -383,6 +413,10 @@ export default function AddProtocolModal({
         name: initialData.name || "",
         value: initialData.value || "",
         file: [],
+        currentDate:
+          initialData?.currentDate?.split("T")[0] ||
+          new Date().toISOString().split("T")[0],
+        currentPercentage: initialData.currentPercentage || "0",
         cashFlows: initialData.cashFlows?.length
           ? initialData.cashFlows.map((cf) => ({
               cashID: cf._id,
@@ -417,6 +451,8 @@ export default function AddProtocolModal({
         cashFlows: [
           { notes: "", completionPercentage: "", withdrawalPercentage: "" },
         ],
+        currentDate: new Date().toISOString().split("T")[0],
+        currentPercentage: "0",
         paymentOrders: [{ number: "", value: "", date: "", file: [] }],
         urgentWorksPercentage: "",
         incentivesPercentage: "",
@@ -572,11 +608,13 @@ export default function AddProtocolModal({
             {step === 1 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Input
+                  rules={{ required: "هذا الحقل مطلوب" }}
                   label="اسم البروتوكول"
                   {...register("name", { required: "هذا الحقل مطلوب" })}
                   error={errors.name}
                 />
                 <Input
+                  rules={{ required: "هذا الحقل مطلوب" }}
                   label="قيمة البروتوكول"
                   {...register("value", { required: "هذا الحقل مطلوب" })}
                   error={errors.value}
@@ -588,6 +626,33 @@ export default function AddProtocolModal({
                     {...register("file")}
                   />
                 </div>
+                <Input
+                  type="number"
+                  rules={{ required: "هذا الحقل مطلوب" }}
+                  label="نسبة التنفيذ"
+                  {...register("currentPercentage", {
+                    required: "هذا الحقل مطلوب",
+                    min: {
+                      value: 0,
+                      message: "لا يمكن ان يكون نسبة التنفيذ اقل من 0%",
+                    },
+                    max: {
+                      value: 100,
+                      message: "لا يمكن ان يكون نسبة التنفيذ اكبر من 100%",
+                    },
+                    valueAsNumber: true,
+                  })}
+                  error={errors.currentPercentage}
+                />
+                <Input
+                  type="date"
+                  rules={{ required: "هذا الحقل مطلوب" }}
+                  label="نسبة التنفيذ"
+                  {...register("currentDate", {
+                    required: "هذا الحقل مطلوب",
+                  })}
+                  error={errors.currentDate}
+                />
               </div>
             )}
 

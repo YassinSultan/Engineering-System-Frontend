@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaChevronDown } from "react-icons/fa6";
 import getFileUrl from "../../../utils/getDownladLink";
-import { FaDownload, FaFile } from "react-icons/fa";
+import { FaCheck, FaDownload, FaFile } from "react-icons/fa";
 import Button from "../../ui/Button/Button";
 
 export default function ProtocolCard({ protocol, onUpdate }) {
@@ -14,15 +14,21 @@ export default function ProtocolCard({ protocol, onUpdate }) {
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center justify-between p-4 cursor-pointer select-none"
       >
-        <div>
-          <h6 className="text-lg font-semibold">
-            اسم البروتوكول:
-            <span className="ms-2 font-normal">{protocol.name}</span>
-          </h6>
-          <p className="text-sm opacity-80">
-            قيمة البروتوكول:
-            <span className="ms-2">{protocol.value}</span>
-          </p>
+        <div className="flex gap-4 items-center">
+          <div className="pe-2 border-e border-primary-500">
+            <h6 className="text-lg font-semibold">
+              اسم البروتوكول:
+              <span className="ms-2 font-normal">{protocol.name}</span>
+            </h6>
+            <p className="text-sm opacity-80">
+              قيمة البروتوكول:
+              <span className="ms-2">{protocol.value}</span>
+            </p>
+          </div>
+          <span className="bg-primary-200/40 dark:bg-primary-700/40 px-4 py-1 border border-primary-500 rounded-full text-xs">
+            <span className="me-2">نسبة التنفيذ</span>
+            {protocol.currentPercentage} %
+          </span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -183,6 +189,31 @@ export default function ProtocolCard({ protocol, onUpdate }) {
               </div>
             ) : (
               <p className="text-sm opacity-70">لا توجد اوامر دفع </p>
+            )}
+          </div>
+          {/* excutionHistory */}
+          <div className="rounded-md border border-primary-600 p-3 h-fit col-span-full">
+            <h6 className="mb-3 font-semibold border-b border-primary-600 pb-1">
+              سجل التنفيذ
+            </h6>
+            {protocol.executionHistory?.length ? (
+              <ol className="relative border-s ms-4">
+                {protocol.executionHistory.map((p, index) => (
+                  <li className="mb-10 ms-6" key={index}>
+                    <span className="absolute flex items-center justify-center w-6 h-6 bg-primary-200 text-primary-content-200 rounded-full -start-3 ring-2 ">
+                      <FaCheck />
+                    </span>
+                    <time className="bg-neutral-secondary-medium border border-default-medium text-heading text-xs font-medium px-1.5 py-0.5 rounded">
+                      {protocol.executionHistory[0].date.split("T")[0]}
+                    </time>
+                    <h3 className="mt-3">
+                      <span>نسبة التنفيذ: {p.percentage}%</span>
+                    </h3>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="text-sm opacity-70">لا توجد سجلات تنفيذ</p>
             )}
           </div>
         </div>
