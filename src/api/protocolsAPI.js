@@ -15,3 +15,8 @@ export const updateProtocol = async ({ id, formData }) => {
     });
     return res.data;
 };
+
+export const updateImplementationRate = async ({ id, data }) => {
+    const res = await api.patch(`/protocols/${id}/implementation-rate`, data);
+    return res.data;
+};
