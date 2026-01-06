@@ -29,8 +29,23 @@ import NotFound from "../NotFound/NotFound";
 import { VscReferences } from "react-icons/vsc";
 import AddProtocolModal from "./AddProtocolModal";
 import ProtocolCard from "./ProtocolCard";
+import ContractPermissionModal from "./ContractPermissionModal";
+import ContractPermissionCard from "./ContractPermissionCard";
+import WithdrawalPermissionCard from "./WithdrawalPermissionCard";
+import WithdrawalPermissionModal from "./WithdrawalPermissionModal";
 export default function SpecificProject() {
   const [tab, setTab] = useState("files");
+  const [showWithdrawalPermissionModal, setShowWithdrawalPermissionModal] =
+    useState(false);
+  const [modeWithdrawalPermissionModal, setModeWithdrawalPermissionModal] =
+    useState("create");
+  const [WithdrawalPermissionData, setWithdrawalPermissionData] =
+    useState(null);
+  const [showContractPermissionModal, setShowContractPermissionModal] =
+    useState(false);
+  const [modeContractPermissionModal, setModeContractPermissionModal] =
+    useState("create");
+  const [contractPermissionData, setContractPermissionData] = useState(null);
   const [showProtocolModal, setShowProtocolModal] = useState(false);
   const [modeProtocolModal, setModeProtocolModal] = useState("create");
   const [protocolData, setProtocolData] = useState(null);
@@ -232,6 +247,28 @@ export default function SpecificProject() {
                 >
                   المستندات
                 </button>
+                <button
+                  onClick={() => setTab("contractPermissions")}
+                  type="button"
+                  className={`px-4 py-1 rounded-md cursor-pointer text-sm  ${
+                    tab === "contractPermissions"
+                      ? "bg-primary-500 text-primary-content-500"
+                      : ""
+                  }`}
+                >
+                  صلاحيات التعاقد
+                </button>
+                <button
+                  onClick={() => setTab("WithdrawalPermissions")}
+                  type="button"
+                  className={`px-4 py-1 rounded-md cursor-pointer text-sm  ${
+                    tab === "WithdrawalPermissions"
+                      ? "bg-primary-500 text-primary-content-500"
+                      : ""
+                  }`}
+                >
+                  صلاحيات الصرف
+                </button>
                 {data.contractingParty === "CIVILIAN" && (
                   <button
                     onClick={() => setTab("protocols")}
@@ -421,6 +458,86 @@ export default function SpecificProject() {
               </CardBody>
             </>
           )}
+          {tab === "contractPermissions" && (
+            <>
+              <CardBody>
+                <div className="mb-4">
+                  <Can action="projects:create:contractPermission">
+                    <Button
+                      icon={<FaPlus />}
+                      onClick={() => {
+                        setModeContractPermissionModal("create");
+                        setShowContractPermissionModal(true);
+                      }}
+                    >
+                      اضافة سماح بالتعاقد
+                    </Button>
+                  </Can>
+                </div>
+                {data.contractPermissions.length ? (
+                  <>
+                    {data.contractPermissions.map((contract) => (
+                      <ContractPermissionCard
+                        key={contract._id}
+                        contract={contract}
+                        onUpdate={(contract) => {
+                          setContractPermissionData(contract);
+                          setModeContractPermissionModal("update");
+                          setShowContractPermissionModal(true);
+                        }}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
+                      <h6 className="mb-4">لا يوجد سماحات بالتعاقد</h6>
+                    </div>
+                  </>
+                )}
+              </CardBody>
+            </>
+          )}
+          {tab === "WithdrawalPermissions" && (
+            <>
+              <CardBody>
+                <div className="mb-4">
+                  <Can action="projects:create:contractPermission">
+                    <Button
+                      icon={<FaPlus />}
+                      onClick={() => {
+                        setModeWithdrawalPermissionModal("create");
+                        setShowWithdrawalPermissionModal(true);
+                      }}
+                    >
+                      اضافة سماح بالصرف
+                    </Button>
+                  </Can>
+                </div>
+                {data.withdrawalPermissions.length ? (
+                  <>
+                    {data.withdrawalPermissions.map((withdrawal) => (
+                      <WithdrawalPermissionCard
+                        key={withdrawal._id}
+                        withdrawal={withdrawal}
+                        onUpdate={(withdrawal) => {
+                          setWithdrawalPermissionData(withdrawal);
+                          setModeWithdrawalPermissionModal("update");
+                          setShowWithdrawalPermissionModal(true);
+                        }}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
+                      <h6 className="mb-4">لا يوجد سماحات بالصرف</h6>
+                    </div>
+                  </>
+                )}
+              </CardBody>
+            </>
+          )}
         </Card>
       </div>
       <AddProtocolModal
@@ -432,6 +549,28 @@ export default function SpecificProject() {
         }}
         mode={modeProtocolModal}
         initialData={modeProtocolModal === "update" ? protocolData : null}
+      />
+      <ContractPermissionModal
+        projectID={id}
+        isOpen={showContractPermissionModal}
+        onClose={() => setShowContractPermissionModal(false)}
+        mode={modeContractPermissionModal}
+        initialData={
+          modeContractPermissionModal === "update"
+            ? contractPermissionData
+            : null
+        }
+      />
+      <WithdrawalPermissionModal
+        projectID={id}
+        isOpen={showWithdrawalPermissionModal}
+        onClose={() => setShowWithdrawalPermissionModal(false)}
+        mode={modeWithdrawalPermissionModal}
+        initialData={
+          modeWithdrawalPermissionModal === "update"
+            ? WithdrawalPermissionData
+            : null
+        }
       />
     </section>
   );
