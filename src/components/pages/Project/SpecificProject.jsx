@@ -33,8 +33,22 @@ import ContractPermissionModal from "./ContractPermissionModal";
 import ContractPermissionCard from "./ContractPermissionCard";
 import WithdrawalPermissionCard from "./WithdrawalPermissionCard";
 import WithdrawalPermissionModal from "./WithdrawalPermissionModal";
+import FinancialAllocationModal from "./FinancialAllocationModal";
+import FinancialAllocationCard from "./FinancialAllocationCard";
+import EstimatedCostModal from "./EstimatedCostModal";
+import EstimatedCostCard from "./EstimatedCostCard";
 export default function SpecificProject() {
   const [tab, setTab] = useState("files");
+  const [showEstimatedCostModal, setShowEstimatedCostModal] = useState(false);
+  const [modeEstimatedCostModal, setModeEstimatedCostModal] =
+    useState("create");
+  const [EstimatedCostData, setEstimatedCostData] = useState(null);
+  const [showFinancialAllocationsModal, setShowFinancialAllocationsModal] =
+    useState(false);
+  const [modeFinancialAllocationsModal, setModeFinancialAllocationsModal] =
+    useState("create");
+  const [FinancialAllocationsData, setFinancialAllocationsData] =
+    useState(null);
   const [showWithdrawalPermissionModal, setShowWithdrawalPermissionModal] =
     useState(false);
   const [modeWithdrawalPermissionModal, setModeWithdrawalPermissionModal] =
@@ -268,6 +282,28 @@ export default function SpecificProject() {
                   }`}
                 >
                   صلاحيات الصرف
+                </button>
+                <button
+                  onClick={() => setTab("FinancialAllocations")}
+                  type="button"
+                  className={`px-4 py-1 rounded-md cursor-pointer text-sm  ${
+                    tab === "FinancialAllocations"
+                      ? "bg-primary-500 text-primary-content-500"
+                      : ""
+                  }`}
+                >
+                  متخصصات مالية
+                </button>
+                <button
+                  onClick={() => setTab("EstimatedCost")}
+                  type="button"
+                  className={`px-4 py-1 rounded-md cursor-pointer text-sm  ${
+                    tab === "EstimatedCost"
+                      ? "bg-primary-500 text-primary-content-500"
+                      : ""
+                  }`}
+                >
+                  التكلفة التقديرية
                 </button>
                 {data.contractingParty === "CIVILIAN" && (
                   <button
@@ -538,6 +574,86 @@ export default function SpecificProject() {
               </CardBody>
             </>
           )}
+          {tab === "FinancialAllocations" && (
+            <>
+              <CardBody>
+                <div className="mb-4">
+                  <Can action="projects:create:financialAllocation">
+                    <Button
+                      icon={<FaPlus />}
+                      onClick={() => {
+                        setModeFinancialAllocationsModal("create");
+                        setShowFinancialAllocationsModal(true);
+                      }}
+                    >
+                      اضافة تخصص مالي
+                    </Button>
+                  </Can>
+                </div>
+                {data.financialAllocations?.length ? (
+                  <>
+                    {data.financialAllocations.map((financialAllocation) => (
+                      <FinancialAllocationCard
+                        key={financialAllocation._id}
+                        financialAllocation={financialAllocation}
+                        onUpdate={(financialAllocation) => {
+                          setFinancialAllocationsData(financialAllocation);
+                          setModeFinancialAllocationsModal("update");
+                          setShowFinancialAllocationsModal(true);
+                        }}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
+                      <h6 className="mb-4">لا يوجد تخصصات مالية </h6>
+                    </div>
+                  </>
+                )}
+              </CardBody>
+            </>
+          )}
+          {tab === "EstimatedCost" && (
+            <>
+              <CardBody>
+                <div className="mb-4">
+                  <Can action="projects:create:financialAllocation">
+                    <Button
+                      icon={<FaPlus />}
+                      onClick={() => {
+                        setModeEstimatedCostModal("create");
+                        setShowEstimatedCostModal(true);
+                      }}
+                    >
+                      اضافة تكلفة تقديرية
+                    </Button>
+                  </Can>
+                </div>
+                {data.estimatedCosts?.length ? (
+                  <>
+                    {data.estimatedCosts.map((estimatedCost) => (
+                      <EstimatedCostCard
+                        key={estimatedCost._id}
+                        estimatedCost={estimatedCost}
+                        onUpdate={(estimatedCost) => {
+                          setEstimatedCostData(estimatedCost);
+                          setModeEstimatedCostModal("update");
+                          setShowEstimatedCostModal(true);
+                        }}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
+                      <h6 className="mb-4">لا يوجد تكلفات تقديرية</h6>
+                    </div>
+                  </>
+                )}
+              </CardBody>
+            </>
+          )}
         </Card>
       </div>
       <AddProtocolModal
@@ -570,6 +686,26 @@ export default function SpecificProject() {
           modeWithdrawalPermissionModal === "update"
             ? WithdrawalPermissionData
             : null
+        }
+      />
+      <FinancialAllocationModal
+        projectID={id}
+        isOpen={showFinancialAllocationsModal}
+        onClose={() => setShowFinancialAllocationsModal(false)}
+        mode={modeFinancialAllocationsModal}
+        initialData={
+          modeFinancialAllocationsModal === "update"
+            ? FinancialAllocationsData
+            : null
+        }
+      />
+      <EstimatedCostModal
+        projectID={id}
+        isOpen={showEstimatedCostModal}
+        onClose={() => setShowEstimatedCostModal(false)}
+        mode={modeEstimatedCostModal}
+        initialData={
+          modeEstimatedCostModal === "update" ? EstimatedCostData : null
         }
       />
     </section>
