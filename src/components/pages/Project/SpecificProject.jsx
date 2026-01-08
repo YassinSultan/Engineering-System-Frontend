@@ -6,7 +6,7 @@ import Loading from "../../common/Loading/Loading";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import Can from "../../common/Can/Can";
 import Button from "../../ui/Button/Button";
-import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowForward, IoMdSwap } from "react-icons/io";
 import Card from "../../ui/Card/Card";
 import CardHeader from "../../ui/Card/CardHeader";
 import CardBody from "../../ui/Card/CardBody";
@@ -15,6 +15,7 @@ import {
   FaDollarSign,
   FaDownload,
   FaFile,
+  FaFileVideo,
   FaPlus,
   FaPlusCircle,
   FaRegEdit,
@@ -37,8 +38,12 @@ import FinancialAllocationModal from "./FinancialAllocationModal";
 import FinancialAllocationCard from "./FinancialAllocationCard";
 import EstimatedCostModal from "./EstimatedCostModal";
 import EstimatedCostCard from "./EstimatedCostCard";
+import AdditionalFilesModal from "./AdditionalFilesModal";
 export default function SpecificProject() {
   const [tab, setTab] = useState("files");
+  const [modalFor, setModalFor] = useState("presentationFile"); //"presentationFile" |"aerialPhotographyFile"
+  const [showAdditionalFilesModal, setShowAdditionalFilesModal] =
+    useState(false);
   const [showEstimatedCostModal, setShowEstimatedCostModal] = useState(false);
   const [modeEstimatedCostModal, setModeEstimatedCostModal] =
     useState("create");
@@ -451,6 +456,128 @@ export default function SpecificProject() {
                     </div>
                   </div>
                 )}
+                <Card>
+                  <CardHeader>
+                    <h3 className="text-lg font-semibold">
+                      ملفات العرض والتصوير الجوي
+                    </h3>
+                  </CardHeader>
+                  <CardBody>
+                    {data.presentationFile ? (
+                      <div className="p-3 bg-background/40 rounded-md shadow flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              window.open(
+                                getFileUrl(data.presentationFile),
+                                "_blank"
+                              )
+                            }
+                          >
+                            <FaDownload />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setModalFor("presentationFile");
+                              setShowAdditionalFilesModal(true);
+                            }}
+                          >
+                            <IoMdSwap />
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex flex-col items-end">
+                            <span>ملف العرض</span>
+                            <span className="text-sm font-light">
+                              {
+                                data.presentationFile
+                                  .split("/")
+                                  .pop()
+                                  .split("-")[1]
+                              }
+                            </span>
+                          </div>
+                          <div>
+                            <FaFile size={20} className="text-primary-500" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
+                        <h6 className="mb-4">لا يوجد ملف عرض</h6>
+                        <Button
+                          icon={<FaPlus />}
+                          onClick={() => {
+                            setModalFor("presentationFile");
+                            setShowAdditionalFilesModal(true);
+                          }}
+                        >
+                          اضافة ملف عرض
+                        </Button>
+                      </div>
+                    )}
+                    {data.aerialPhotographyFile ? (
+                      <div className="p-3 bg-background/40 rounded-md shadow flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              window.open(
+                                getFileUrl(data.aerialPhotographyFile),
+                                "_blank"
+                              )
+                            }
+                          >
+                            <FaDownload />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setModalFor("aerialPhotographyFile");
+                              setShowAdditionalFilesModal(true);
+                            }}
+                          >
+                            <IoMdSwap />
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex flex-col items-end">
+                            <span>ملف تصوير جوي</span>
+                            <span className="text-sm font-light">
+                              {
+                                data.aerialPhotographyFile
+                                  .split("/")
+                                  .pop()
+                                  .split("-")[1]
+                              }
+                            </span>
+                          </div>
+                          <div>
+                            <FaFileVideo
+                              size={20}
+                              className="text-primary-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
+                        <h6 className="mb-4">لا يوجد ملف تصوير جوي</h6>
+                        <Button
+                          icon={<FaPlus />}
+                          onClick={() => {
+                            setModalFor("aerialPhotographyFile");
+                            setShowAdditionalFilesModal(true);
+                          }}
+                        >
+                          اضافة ملف تصوير جوي
+                        </Button>
+                      </div>
+                    )}
+                  </CardBody>
+                </Card>
               </CardBody>
             </>
           )}
@@ -707,6 +834,12 @@ export default function SpecificProject() {
         initialData={
           modeEstimatedCostModal === "update" ? EstimatedCostData : null
         }
+      />
+      <AdditionalFilesModal
+        projectID={id}
+        isOpen={showAdditionalFilesModal}
+        onClose={() => setShowAdditionalFilesModal(false)}
+        modalFor={modalFor}
       />
     </section>
   );

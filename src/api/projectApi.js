@@ -25,3 +25,15 @@ export const updateProject = async ({ id, data }) => {
     });
     return res.data;
 };
+export const updatePresentationFile = async ({ id, formData }) => {
+    const res = await api.patch(`/projects/${id}/presentation-file`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
+export const updateAerialPhotographyFile = async ({ id, formData }) => {
+    const res = await api.patch(`/projects/${id}/aerial-photography-file`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};
