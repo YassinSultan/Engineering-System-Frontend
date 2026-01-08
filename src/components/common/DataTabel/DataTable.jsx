@@ -183,9 +183,9 @@ export default function DataTable({
           </div>
         </div>
       )}
-      <div className="w-full overflow-auto rounded-lg">
+      <div className="w-full max-h-[70vh] overflow-auto rounded-lg">
         <table className="w-full min-w-max text-sm text-nowrap">
-          <thead className="bg-table-header text-table-header-foreground">
+          <thead className="sticky top-0 z-30 bg-table-header text-table-header-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
