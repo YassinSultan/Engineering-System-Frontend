@@ -52,7 +52,8 @@ export default function WithdrawalPermissionForm({
       queryClient.invalidateQueries(["project", projectID]);
       handleClose();
     },
-    onError: () => {
+    onError: (e) => {
+      console.log(e);
       toast.error("حدث خطأ");
     },
   });
@@ -67,7 +68,8 @@ export default function WithdrawalPermissionForm({
       queryClient.invalidateQueries(["project", projectID]);
       handleClose();
     },
-    onError: () => {
+    onError: (e) => {
+      console.log(e);
       toast.error("حدث خطأ");
     },
   });
@@ -81,7 +83,7 @@ export default function WithdrawalPermissionForm({
     if (isUpdateMode) {
       updateWithdrawalPermissionMutate({
         projectID: projectID,
-        contractID: initialData._id,
+        withdrawalID: initialData._id,
         formData,
       });
     } else {

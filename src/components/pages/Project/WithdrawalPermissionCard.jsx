@@ -2,8 +2,13 @@ import React from "react";
 import Button from "../../ui/Button/Button";
 import getFileUrl from "../../../utils/getDownladLink";
 import { FaDownload } from "react-icons/fa";
+import Can from "../../common/Can/Can";
 
-export default function WithdrawalPermissionCard({ withdrawal, onUpdate }) {
+export default function WithdrawalPermissionCard({
+  organizationalUnit,
+  withdrawal,
+  onUpdate,
+}) {
   return (
     <div className="my-3 rounded-lg border border-primary-500 bg-primary-50 text-primary-content-50 dark:bg-primary-900 dark:text-primary-content-900">
       {/* Header */}
@@ -32,15 +37,20 @@ export default function WithdrawalPermissionCard({ withdrawal, onUpdate }) {
               <FaDownload />
             </Button>
           </div>
-          <Button
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate(withdrawal);
-            }}
+          <Can
+            action="projects:update:withdrawalPermission"
+            unitId={organizationalUnit}
           >
-            تعديل
-          </Button>
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdate(withdrawal);
+              }}
+            >
+              تعديل
+            </Button>
+          </Can>
         </div>
       </div>
     </div>

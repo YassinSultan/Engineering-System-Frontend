@@ -2,8 +2,10 @@ import React from "react";
 import Button from "../../ui/Button/Button";
 import getFileUrl from "../../../utils/getDownladLink";
 import { FaDownload } from "react-icons/fa";
+import Can from "../../common/Can/Can";
 
 export default function FinancialAllocationCard({
+  organizationalUnit,
   financialAllocation,
   onUpdate,
 }) {
@@ -39,15 +41,20 @@ export default function FinancialAllocationCard({
               <FaDownload />
             </Button>
           </div>
-          <Button
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate(financialAllocation);
-            }}
+          <Can
+            action={"projects:update:financialAllocation"}
+            unitId={organizationalUnit}
           >
-            تعديل
-          </Button>
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdate(financialAllocation);
+              }}
+            >
+              تعديل
+            </Button>
+          </Can>
         </div>
       </div>
     </div>

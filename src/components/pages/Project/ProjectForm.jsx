@@ -148,7 +148,17 @@ export default function ProjectForm({ mode = "create" }) {
       data: formData,
     });
   };
+  const canSelectUnit = user.permissions.some(
+    (p) =>
+      p.action === "projects:create:project" &&
+      (p.scope === "ALL" || p.scope === "CUSTOM_UNIT")
+  );
 
+  const fixedUnit = user.permissions.some(
+    (p) => p.action === "projects:create:project" && p.scope === "OWN_UNIT"
+  )
+    ? user.organizationalUnit
+    : null;
   // reset form
   useEffect(() => {
     if (isUpdate && data) {
@@ -183,7 +193,11 @@ export default function ProjectForm({ mode = "create" }) {
       });
     }
   }, [mode, data, reset, isUpdate]);
-
+  useEffect(() => {
+    if (fixedUnit) {
+      setValue("organizationalUnit", fixedUnit);
+    }
+  }, [fixedUnit, setValue]);
   if (isLoading) return <Loading />;
   return (
     <>
@@ -433,24 +447,26 @@ export default function ProjectForm({ mode = "create" }) {
                 </div>
               )}
             </div>
-            <div className="col-span-full mt-2">
-              <label className="block text-sm font-medium mb-1">
-                الوحدة التابع لها
-              </label>
+            {canSelectUnit && (
+              <div className="col-span-full mt-2">
+                <label className="block text-sm font-medium mb-1">
+                  الوحدة التابع لها
+                </label>
 
-              <div
-                onClick={() => setIsUnitModalOpen(true)}
-                className="border rounded px-3 py-2 cursor-pointer "
-              >
-                {selectedUnit?.name || "اختر الوحدة التابع لها"}
+                <div
+                  onClick={() => setIsUnitModalOpen(true)}
+                  className="border rounded px-3 py-2 cursor-pointer"
+                >
+                  {selectedUnit?.name || "اختر الوحدة التابع لها"}
+                </div>
+
+                {errors.organizationalUnit && (
+                  <p className="text-red-500 text-sm mt-1">
+                    الوحدة التابع لها مطلوبة
+                  </p>
+                )}
               </div>
-
-              {errors.organizationalUnit && (
-                <p className="text-red-500 text-sm mt-1">
-                  الوحدة التابع لها مطلوبة
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Submit Button */}
             <div className="mt-4">

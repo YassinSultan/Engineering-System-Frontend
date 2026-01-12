@@ -59,62 +59,6 @@ export default function Project() {
       toast.error("حدث خطاء اثناء جلب المستخدمين");
     },
   });
-  // const { data: suggestions } = useQuery({
-  //   queryKey: ["suggestions", searchField, searchString],
-  //   queryFn: () => suggestionFilter(searchField, { search: searchString }),
-  //   enabled: searchString.length > 1, // مشتغلش إلا لما يكتب كفاية
-  // });
-  // // Delete Mutation
-  // const deleteMutation = useMutation({
-  //   mutationFn: deleteUser,
-  //   onSuccess: () => {
-  //     toast.success("تم حذف المستخدم بنجاح");
-  //     refetch();
-  //   },
-  //   onError: (error) => {
-  //     console.log(
-  //       "فشل حذف المستخدم: " + (error.response?.data?.message || error.message)
-  //     );
-  //     toast.error("فشل حذف المستخدم");
-  //   },
-  // });
-  // const excelMutation = useMutation({
-  //   mutationKey: ["export-companies"],
-  //   mutationFn: () =>
-  //     exportUsers({
-  //       search: globalFilter, // البحث الحالي
-  //       filters: {}, // لو عندك فلاتر متقدمة، مررها هنا
-  //       // مثال: filters: advancedFilters,
-  //     }),
-  //   onSuccess: () => {
-  //     toast.success("تم تصدير الملف بنجاح!");
-  //   },
-  //   onError: (error) => {
-  //     if (error.response?.status === 404) {
-  //       toast.error("لا توجد بيانات للتصدير بناءً على الفلاتر الحالية");
-  //     } else {
-  //       toast.error("فشل في تصدير الملف");
-  //     }
-  //     console.error("Export error:", error);
-  //   },
-  // });
-  // const handelDelete = (id) => {
-  //   Swal.fire({
-  //     title: "هل انت متاكد من حذف المستخدم؟",
-  //     text: "لا يمكنك التراجع عن هذا الحذف",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#3085d6",
-  //     cancelButtonColor: "#d33",
-  //     confirmButtonText: "حذف",
-  //     cancelButtonText: "الغاء",
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       deleteMutation.mutate(id);
-  //     }
-  //   });
-  // };
-
   //   table coulmn
   const columns = [
     {
@@ -266,28 +210,23 @@ export default function Project() {
       enableFilter: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <Can action="projects:read">
+          <Can action="projects:read" unitId={row.original.organizationalUnit}>
             <NavLink to={`/projects/read/${row.original._id}`}>
               <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                 <BsEye className="w-4 h-4" />
               </button>
             </NavLink>
           </Can>
-          <Can action="users:update">
+          <Can
+            action="projects:update:project"
+            unitId={row.original.organizationalUnit}
+          >
             <NavLink to={`/projects/update/${row.original._id}`}>
               <button className="p-2 rounded-md hover:bg-primary/10 text-primary transition-colors">
                 <BiEdit className="w-4 h-4" />
               </button>
             </NavLink>
           </Can>
-          {/* <Can action="users:delete">
-            <button
-              onClick={() => handelDelete(row.original._id)}
-              className="p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
-            >
-              <BsTrash2 className="w-4 h-4" />
-            </button>
-          </Can> */}
         </div>
       ),
     },
@@ -311,7 +250,7 @@ export default function Project() {
               {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
             </Button>
           </Can> */}
-          <Can action="projects:create">
+          <Can action="projects:create:project">
             <Button
               onClick={() => navigate("/projects/create")}
               icon={<FaPlus />}

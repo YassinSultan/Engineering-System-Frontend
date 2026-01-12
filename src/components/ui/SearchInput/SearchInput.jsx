@@ -119,6 +119,7 @@ export default function SearchInput({
       marginTop: "0.8rem",
       boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
       backgroundColor: "var(--color-base)",
+      zIndex: 9999,
     }),
     option: (base, state) => ({
       ...base,

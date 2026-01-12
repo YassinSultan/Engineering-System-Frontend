@@ -4,59 +4,20 @@ import { useParams } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getUser, updateUserPermissions } from "../../../api/userAPI";
 import Loading from "../../common/Loading/Loading";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import Button from "../../ui/Button/Button";
-import { BiChevronDown, BiChevronLeft } from "react-icons/bi";
 import toast from "react-hot-toast";
 import OrganizationalTreeModal from "../../common/OrganizationalTreeModal/OrganizationalTreeModal";
-
+import { permissionGroups } from "../../../utils/permissionConfig";
+import { IoIosArrowDown } from "react-icons/io";
 export default function PermissionsUser() {
-  const permissionGroups = [
-    {
-      id: "users",
-      label: "إدارة المستخدمين",
-      prefix: "users:",
-      permissions: [
-        { name: "create", label: "إضافة مستخدم" },
-        {
-          name: "update",
-          label: "تعديل مستخدم",
-          subPermissions: [
-            { name: "updateAll", label: "تعديل كامل للمستخدم" },
-            { name: "updatePermissions", label: "تعديل صلاحيات المستخدم" },
-          ],
-        },
-        { name: "delete", label: "حذف مستخدم" },
-        { name: "read", label: "عرض المستخدمين" },
-      ],
-    },
-    {
-      id: "companies",
-      label: "إدارة الشركات",
-      prefix: "companies:",
-      permissions: [
-        { name: "create", label: "إضافة شركة" },
-        {
-          name: "update",
-          label: "تعديل بيانات الشركة",
-          subPermissions: [
-            { name: "updateDocuments", label: "تعديل الأوراق والمستندات" },
-            { name: "updateAll", label: "تعديل كامل للشركة" },
-            { name: "updateName", label: "تعديل اسم الشركة" },
-          ],
-        },
-        { name: "delete", label: "حذف شركة" },
-        { name: "read", label: "عرض الشركات" },
-      ],
-    },
-    // أضف مجموعات أخرى حسب الحاجة
-  ];
-
+  const [isOpenGroup, setIsOpenGroup] = useState("");
   const { id } = useParams();
   const {
     data: userData,
     isLoading: userLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: ["user", id],
     queryFn: () => getUser({ id }),
@@ -65,11 +26,15 @@ export default function PermissionsUser() {
 
   const user = userData?.data;
 
-  const { handleSubmit, setValue, watch, reset } = useForm({
+  const { control, handleSubmit, setValue, reset } = useForm({
     defaultValues: { permissions: [] },
   });
 
-  const permissions = watch("permissions") || [];
+  const permissions = useWatch({
+    control,
+    name: "permissions",
+    defaultValue: [],
+  });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [currentEditingPerm, setCurrentEditingPerm] = useState(null); // { action }
@@ -160,12 +125,14 @@ export default function PermissionsUser() {
   };
 
   if (userLoading) return <Loading />;
-  if (isError)
+  if (isError) {
+    console.log(error);
     return (
       <div className="text-red-600 text-center py-10">
         حدث خطأ في تحميل بيانات المستخدم
       </div>
     );
+  }
 
   return (
     <>
@@ -192,233 +159,265 @@ export default function PermissionsUser() {
                   key={group.id}
                   className="border border-gray-300 rounded-xl overflow-hidden bg-background shadow-sm"
                 >
-                  <div className="p-5 bg-base">
+                  <div
+                    className="p-5 bg-base flex items-center justify-between"
+                    onClick={() => {
+                      if (isOpenGroup === group.id) {
+                        setIsOpenGroup(null);
+                        return;
+                      }
+                      setIsOpenGroup(group.id);
+                    }}
+                  >
                     <h3 className="text-xl font-semibold">{group.label}</h3>
+                    <IoIosArrowDown
+                      size={20}
+                      className={`${
+                        isOpenGroup === group.id ? "rotate-180" : ""
+                      }
+                      transition-transform duration-300 ease-in-out`}
+                    />
                   </div>
 
-                  <div className="p-6 space-y-6">
-                    {group.permissions.map((perm) => {
-                      const actionBase = `${group.prefix}${perm.name}`;
-                      const subActions = perm.subPermissions
-                        ? perm.subPermissions.map(
-                            (sp) => `${actionBase}:${sp.name}`
-                          )
-                        : [actionBase];
+                  {isOpenGroup === group.id && (
+                    <div
+                      className={`overflow-hidden transition-transform duration-300 ease-in-out
+                          ${
+                            isOpenGroup == group.id
+                              ? "max-h-[1000px] p-6 space-y-6 overflow-y-auto"
+                              : "max-h-0 p-0"
+                          }
+                        `}
+                    >
+                      {group.permissions.map((perm) => {
+                        console.log("perm", perm);
+                        const actionBase = `${group.prefix}${perm.name}`;
+                        const subActions = perm.subPermissions
+                          ? perm.subPermissions.map(
+                              (sp) => `${actionBase}:${sp.name}`
+                            )
+                          : [actionBase];
 
-                      // نعتبر الصلاحية الرئيسية مفعلة لو أي sub مفعلة
-                      const isEnabled = subActions.some((act) =>
-                        permissions.some((p) => p.action === act)
-                      );
+                        // نعتبر الصلاحية الرئيسية مفعلة لو أي sub مفعلة
+                        const isEnabled = subActions.some((act) =>
+                          permissions.some((p) => p.action === act)
+                        );
 
-                      return (
-                        <div
-                          key={perm.name}
-                          className={`p-5 rounded-lg border ${
-                            isEnabled
-                              ? "bg-blue-50 border-blue-300"
-                              : "bg-gray-50 border-gray-300"
-                          }`}
-                        >
-                          <div className="font-medium text-lg mb-4">
-                            {perm.label}
-                          </div>
+                        return (
+                          <div
+                            key={perm.name}
+                            className={`p-5 rounded-lg border ${
+                              isEnabled
+                                ? "bg-blue-50 border-blue-300"
+                                : "bg-gray-50 border-gray-300"
+                            }`}
+                          >
+                            <div className="font-medium text-lg mb-4">
+                              {perm.label}
+                            </div>
 
-                          {perm.subPermissions ? (
-                            // عرض الصلاحيات الفرعية
-                            <div className="space-y-3 pr-8">
-                              {perm.subPermissions.map((sub) => {
-                                const subAction = `${actionBase}:${sub.name}`;
-                                const scope = getCurrentScope(subAction);
+                            {perm.subPermissions ? (
+                              // عرض الصلاحيات الفرعية
+                              <div className="space-y-3 pr-8">
+                                {perm.subPermissions.map((sub) => {
+                                  const subAction = `${actionBase}:${sub.name}`;
+                                  const scope = getCurrentScope(subAction);
 
-                                return (
-                                  <div key={sub.name} className="space-y-2">
-                                    <label className="flex items-center gap-3">
-                                      <input
-                                        type="checkbox"
-                                        checked={!!scope}
-                                        onChange={(e) =>
-                                          upsertPermission(
-                                            subAction,
-                                            e.target.checked ? "ALL" : null
-                                          )
-                                        }
-                                        className="w-5 h-5 text-blue-600 rounded"
-                                      />
-                                      <span>{sub.label}</span>
-                                    </label>
+                                  return (
+                                    <div key={sub.name} className="space-y-2">
+                                      <label className="flex items-center gap-3">
+                                        <input
+                                          type="checkbox"
+                                          checked={!!scope}
+                                          onChange={(e) =>
+                                            upsertPermission(
+                                              subAction,
+                                              e.target.checked ? "ALL" : null
+                                            )
+                                          }
+                                          className="w-5 h-5 text-blue-600 rounded"
+                                        />
+                                        <span>
+                                          {perm.label} {sub.label}
+                                        </span>
+                                      </label>
 
-                                    {scope && (
-                                      <div className="pr-10 space-y-3">
-                                        <div className="flex items-center gap-6">
-                                          <label className="flex items-center gap-2">
-                                            <input
-                                              type="radio"
-                                              name={`scope-${subAction}`}
-                                              checked={scope === "ALL"}
-                                              onChange={() =>
-                                                upsertPermission(
-                                                  subAction,
-                                                  "ALL"
-                                                )
-                                              }
-                                            />
-                                            <span>كل الوحدات</span>
-                                          </label>
+                                      {scope && (
+                                        <div className="pr-10 space-y-3">
+                                          <div className="flex items-center gap-6">
+                                            <label className="flex items-center gap-2">
+                                              <input
+                                                type="radio"
+                                                name={`scope-${subAction}`}
+                                                checked={scope === "ALL"}
+                                                onChange={() =>
+                                                  upsertPermission(
+                                                    subAction,
+                                                    "ALL"
+                                                  )
+                                                }
+                                              />
+                                              <span>كل الوحدات</span>
+                                            </label>
 
-                                          <label className="flex items-center gap-2">
-                                            <input
-                                              type="radio"
-                                              name={`scope-${subAction}`}
-                                              checked={scope === "OWN_UNIT"}
-                                              onChange={() =>
-                                                upsertPermission(
-                                                  subAction,
-                                                  "OWN_UNIT"
-                                                )
-                                              }
-                                            />
-                                            <span>الوحدة الخاصة به فقط</span>
-                                          </label>
+                                            <label className="flex items-center gap-2">
+                                              <input
+                                                type="radio"
+                                                name={`scope-${subAction}`}
+                                                checked={scope === "OWN_UNIT"}
+                                                onChange={() =>
+                                                  upsertPermission(
+                                                    subAction,
+                                                    "OWN_UNIT"
+                                                  )
+                                                }
+                                              />
+                                              <span>الوحدة الخاصة به فقط</span>
+                                            </label>
 
-                                          <label className="flex items-center gap-2">
-                                            <input
-                                              type="radio"
-                                              name={`scope-${subAction}`}
-                                              checked={scope === "CUSTOM_UNITS"}
-                                              onChange={() =>
-                                                upsertPermission(
-                                                  subAction,
-                                                  "CUSTOM_UNITS",
-                                                  getCurrentUnits(subAction)
-                                                )
-                                              }
-                                            />
-                                            <span>وحدات محددة</span>
-                                          </label>
-                                        </div>
-
-                                        {scope === "CUSTOM_UNITS" && (
-                                          <div className="flex items-center gap-3">
-                                            <span className="text-sm text-gray-600">
-                                              {getUnitNames(
-                                                getCurrentUnits(subAction)
-                                              )}
-                                            </span>
-                                            <button
-                                              type="button"
-                                              onClick={() =>
-                                                openUnitsModal(subAction)
-                                              }
-                                              className="text-primary-600 hover:underline text-sm"
-                                            >
-                                              تعديل الوحدات
-                                            </button>
+                                            <label className="flex items-center gap-2">
+                                              <input
+                                                type="radio"
+                                                name={`scope-${subAction}`}
+                                                checked={
+                                                  scope === "CUSTOM_UNITS"
+                                                }
+                                                onChange={() =>
+                                                  upsertPermission(
+                                                    subAction,
+                                                    "CUSTOM_UNITS",
+                                                    getCurrentUnits(subAction)
+                                                  )
+                                                }
+                                              />
+                                              <span>وحدات محددة</span>
+                                            </label>
                                           </div>
-                                        )}
+
+                                          {scope === "CUSTOM_UNITS" && (
+                                            <div className="flex items-center gap-3">
+                                              <span className="text-sm text-gray-600">
+                                                {getUnitNames(
+                                                  getCurrentUnits(subAction)
+                                                )}
+                                              </span>
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  openUnitsModal(subAction)
+                                                }
+                                                className="text-primary-600 hover:underline text-sm"
+                                              >
+                                                تعديل الوحدات
+                                              </button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              // صلاحية بدون sub
+                              <div className="space-y-3">
+                                <label className="flex items-center gap-3">
+                                  <input
+                                    type="checkbox"
+                                    checked={!!getCurrentScope(actionBase)}
+                                    onChange={(e) =>
+                                      upsertPermission(
+                                        actionBase,
+                                        e.target.checked ? "ALL" : null
+                                      )
+                                    }
+                                    className="w-5 h-5 text-blue-600 rounded"
+                                  />
+                                  <span>تفعيل هذه الصلاحية</span>
+                                </label>
+
+                                {getCurrentScope(actionBase) && (
+                                  <div className="pr-8 space-y-3">
+                                    <div className="flex items-center gap-6">
+                                      <label className="flex items-center gap-2">
+                                        <input
+                                          type="radio"
+                                          name={`scope-${actionBase}`}
+                                          checked={
+                                            getCurrentScope(actionBase) ===
+                                            "ALL"
+                                          }
+                                          onChange={() =>
+                                            upsertPermission(actionBase, "ALL")
+                                          }
+                                        />
+                                        <span>كل الوحدات</span>
+                                      </label>
+                                      <label className="flex items-center gap-2">
+                                        <input
+                                          type="radio"
+                                          name={`scope-${actionBase}`}
+                                          checked={
+                                            getCurrentScope(actionBase) ===
+                                            "OWN_UNIT"
+                                          }
+                                          onChange={() =>
+                                            upsertPermission(
+                                              actionBase,
+                                              "OWN_UNIT"
+                                            )
+                                          }
+                                        />
+                                        <span>الوحدة الخاصة به فقط</span>
+                                      </label>
+                                      <label className="flex items-center gap-2">
+                                        <input
+                                          type="radio"
+                                          name={`scope-${actionBase}`}
+                                          checked={
+                                            getCurrentScope(actionBase) ===
+                                            "CUSTOM_UNITS"
+                                          }
+                                          onChange={() =>
+                                            upsertPermission(
+                                              actionBase,
+                                              "CUSTOM_UNITS",
+                                              getCurrentUnits(actionBase)
+                                            )
+                                          }
+                                        />
+                                        <span>وحدات محددة</span>
+                                      </label>
+                                    </div>
+
+                                    {getCurrentScope(actionBase) ===
+                                      "CUSTOM_UNITS" && (
+                                      <div className="flex items-center gap-3">
+                                        <span className="text-sm text-gray-600">
+                                          {getUnitNames(
+                                            getCurrentUnits(actionBase)
+                                          )}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            openUnitsModal(actionBase)
+                                          }
+                                          className="text-primary-600 hover:underline text-sm"
+                                        >
+                                          تعديل الوحدات
+                                        </button>
                                       </div>
                                     )}
                                   </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            // صلاحية بدون sub
-                            <div className="space-y-3">
-                              <label className="flex items-center gap-3">
-                                <input
-                                  type="checkbox"
-                                  checked={!!getCurrentScope(actionBase)}
-                                  onChange={(e) =>
-                                    upsertPermission(
-                                      actionBase,
-                                      e.target.checked ? "ALL" : null
-                                    )
-                                  }
-                                  className="w-5 h-5 text-blue-600 rounded"
-                                />
-                                <span>تفعيل هذه الصلاحية</span>
-                              </label>
-
-                              {getCurrentScope(actionBase) && (
-                                <div className="pr-8 space-y-3">
-                                  <div className="flex items-center gap-6">
-                                    <label className="flex items-center gap-2">
-                                      <input
-                                        type="radio"
-                                        name={`scope-${actionBase}`}
-                                        checked={
-                                          getCurrentScope(actionBase) === "ALL"
-                                        }
-                                        onChange={() =>
-                                          upsertPermission(actionBase, "ALL")
-                                        }
-                                      />
-                                      <span>كل الوحدات</span>
-                                    </label>
-                                    <label className="flex items-center gap-2">
-                                      <input
-                                        type="radio"
-                                        name={`scope-${actionBase}`}
-                                        checked={
-                                          getCurrentScope(actionBase) ===
-                                          "OWN_UNIT"
-                                        }
-                                        onChange={() =>
-                                          upsertPermission(
-                                            actionBase,
-                                            "OWN_UNIT"
-                                          )
-                                        }
-                                      />
-                                      <span>الوحدة الخاصة به فقط</span>
-                                    </label>
-                                    <label className="flex items-center gap-2">
-                                      <input
-                                        type="radio"
-                                        name={`scope-${actionBase}`}
-                                        checked={
-                                          getCurrentScope(actionBase) ===
-                                          "CUSTOM_UNITS"
-                                        }
-                                        onChange={() =>
-                                          upsertPermission(
-                                            actionBase,
-                                            "CUSTOM_UNITS",
-                                            getCurrentUnits(actionBase)
-                                          )
-                                        }
-                                      />
-                                      <span>وحدات محددة</span>
-                                    </label>
-                                  </div>
-
-                                  {getCurrentScope(actionBase) ===
-                                    "CUSTOM_UNITS" && (
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-sm text-gray-600">
-                                        {getUnitNames(
-                                          getCurrentUnits(actionBase)
-                                        )}
-                                      </span>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          openUnitsModal(actionBase)
-                                        }
-                                        className="text-primary-600 hover:underline text-sm"
-                                      >
-                                        تعديل الوحدات
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

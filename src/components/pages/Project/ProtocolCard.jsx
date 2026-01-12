@@ -3,8 +3,13 @@ import { FaChevronDown } from "react-icons/fa6";
 import getFileUrl from "../../../utils/getDownladLink";
 import { FaCheck, FaDownload, FaFile } from "react-icons/fa";
 import Button from "../../ui/Button/Button";
+import Can from "../../common/Can/Can";
 
-export default function ProtocolCard({ protocol, onUpdate }) {
+export default function ProtocolCard({
+  organizationalUnit,
+  protocol,
+  onUpdate,
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -32,15 +37,17 @@ export default function ProtocolCard({ protocol, onUpdate }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onUpdate(protocol);
-            }}
-          >
-            تعديل
-          </Button>
+          <Can action={"projects:update:protocol"} unitId={organizationalUnit}>
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onUpdate(protocol);
+              }}
+            >
+              تعديل
+            </Button>
+          </Can>
           <FaChevronDown
             className={`transition-transform duration-300 ${
               isOpen ? "rotate-180" : ""

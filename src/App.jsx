@@ -131,7 +131,7 @@ const router = createBrowserRouter([
       {
         path: "projects/create",
         element: (
-          <ProtectedRoute requirePermissions={["projects:create"]}>
+          <ProtectedRoute requirePermissions={["projects:create:project"]}>
             <ProjectForm mode="create" />
           </ProtectedRoute>
         ),
@@ -139,7 +139,7 @@ const router = createBrowserRouter([
       {
         path: "projects/update/:id",
         element: (
-          <ProtectedRoute requirePermissions={["projects:update"]}>
+          <ProtectedRoute requirePermissions={["projects:update:project"]}>
             <ProjectForm mode="update" />
           </ProtectedRoute>
         ),
@@ -147,7 +147,7 @@ const router = createBrowserRouter([
       {
         path: "projects/read/:id",
         element: (
-          <ProtectedRoute requirePermissions={["projects:create"]}>
+          <ProtectedRoute requirePermissions={["projects:read"]}>
             <SpecificProject />
           </ProtectedRoute>
         ),

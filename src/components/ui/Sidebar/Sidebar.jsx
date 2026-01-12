@@ -39,12 +39,12 @@ const menu = [
       {
         label: "إضافة مشروع",
         path: "/projects/create",
-        permissions: ["companies:create"],
+        permissions: ["projects:create:project"],
       },
       {
         label: "قائمة المشاريع",
         path: "/projects",
-        permissions: ["companies:read", "companies:update", "companies:delete"],
+        permissions: ["projects:read", "projects:update", "projects:delete"],
       },
     ],
   },

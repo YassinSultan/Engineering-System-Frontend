@@ -74,6 +74,11 @@ export default function SpecificProject() {
     queryFn: () => getProject(id),
     select: (res) => res.data,
   });
+
+  const handleOrganizationalUnitIDsArray = (organizationalUnits) => {
+    return organizationalUnits?.map((ou) => ou._id);
+  };
+
   if (isLoading) return <Loading />;
   if (isError || data == null) return <NotFound />;
   return (
@@ -116,8 +121,11 @@ export default function SpecificProject() {
           <Button variant="secondary" icon={<FiDownload />}>
             تصدير التقرير
           </Button>
-          <Can action="projects:update">
-            <NavLink to={`/projects/${id}/edit`}>
+          <Can
+            action="projects:update:project"
+            unitId={handleOrganizationalUnitIDsArray(data?.organizationalUnit)}
+          >
+            <NavLink to={`/projects/update/${id}`}>
               <Button icon={<FaRegEdit />}>تعديل</Button>
             </NavLink>
           </Can>
@@ -266,6 +274,7 @@ export default function SpecificProject() {
                 >
                   المستندات
                 </button>
+
                 <button
                   onClick={() => setTab("contractPermissions")}
                   type="button"
@@ -477,15 +486,22 @@ export default function SpecificProject() {
                           >
                             <FaDownload />
                           </Button>
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setModalFor("presentationFile");
-                              setShowAdditionalFilesModal(true);
-                            }}
+                          <Can
+                            action={"projects:update:presentationFile"}
+                            unitId={handleOrganizationalUnitIDsArray(
+                              data.organizationalUnits
+                            )}
                           >
-                            <IoMdSwap />
-                          </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setModalFor("presentationFile");
+                                setShowAdditionalFilesModal(true);
+                              }}
+                            >
+                              <IoMdSwap />
+                            </Button>
+                          </Can>
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="flex flex-col items-end">
@@ -507,15 +523,22 @@ export default function SpecificProject() {
                     ) : (
                       <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
                         <h6 className="mb-4">لا يوجد ملف عرض</h6>
-                        <Button
-                          icon={<FaPlus />}
-                          onClick={() => {
-                            setModalFor("presentationFile");
-                            setShowAdditionalFilesModal(true);
-                          }}
+                        <Can
+                          action={"projects:update:presentationFile"}
+                          unitId={handleOrganizationalUnitIDsArray(
+                            data.organizationalUnits
+                          )}
                         >
-                          اضافة ملف عرض
-                        </Button>
+                          <Button
+                            icon={<FaPlus />}
+                            onClick={() => {
+                              setModalFor("presentationFile");
+                              setShowAdditionalFilesModal(true);
+                            }}
+                          >
+                            اضافة ملف عرض
+                          </Button>
+                        </Can>
                       </div>
                     )}
                     {data.aerialPhotographyFile ? (
@@ -532,15 +555,22 @@ export default function SpecificProject() {
                           >
                             <FaDownload />
                           </Button>
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setModalFor("aerialPhotographyFile");
-                              setShowAdditionalFilesModal(true);
-                            }}
+                          <Can
+                            action={"projects:update:aerialPhotographyFile"}
+                            unitId={handleOrganizationalUnitIDsArray(
+                              data.organizationalUnits
+                            )}
                           >
-                            <IoMdSwap />
-                          </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setModalFor("aerialPhotographyFile");
+                                setShowAdditionalFilesModal(true);
+                              }}
+                            >
+                              <IoMdSwap />
+                            </Button>
+                          </Can>
                         </div>
                         <div className="flex items-center gap-4">
                           <div className="flex flex-col items-end">
@@ -565,15 +595,22 @@ export default function SpecificProject() {
                     ) : (
                       <div className="text-center text-2xl font-bold border p-4 rounded border-dashed border-primary-500 text-primary-500">
                         <h6 className="mb-4">لا يوجد ملف تصوير جوي</h6>
-                        <Button
-                          icon={<FaPlus />}
-                          onClick={() => {
-                            setModalFor("aerialPhotographyFile");
-                            setShowAdditionalFilesModal(true);
-                          }}
+                        <Can
+                          action={"projects:update:aerialPhotographyFile"}
+                          unitId={handleOrganizationalUnitIDsArray(
+                            data.organizationalUnits
+                          )}
                         >
-                          اضافة ملف تصوير جوي
-                        </Button>
+                          <Button
+                            icon={<FaPlus />}
+                            onClick={() => {
+                              setModalFor("aerialPhotographyFile");
+                              setShowAdditionalFilesModal(true);
+                            }}
+                          >
+                            اضافة ملف تصوير جوي
+                          </Button>
+                        </Can>
                       </div>
                     )}
                   </CardBody>
@@ -585,7 +622,12 @@ export default function SpecificProject() {
             <>
               <CardBody>
                 <div className="mb-4">
-                  <Can action="projects:update">
+                  <Can
+                    action="projects:create:protocol"
+                    unitId={handleOrganizationalUnitIDsArray(
+                      data?.organizationalUnit
+                    )}
+                  >
                     <Button
                       icon={<FaPlus />}
                       onClick={() => {
@@ -601,6 +643,9 @@ export default function SpecificProject() {
                   <>
                     {data.protocols.map((protocol) => (
                       <ProtocolCard
+                        organizationalUnit={handleOrganizationalUnitIDsArray(
+                          data?.organizationalUnit
+                        )}
                         key={protocol._id}
                         protocol={protocol}
                         onUpdate={(protocol) => {
@@ -625,7 +670,12 @@ export default function SpecificProject() {
             <>
               <CardBody>
                 <div className="mb-4">
-                  <Can action="projects:create:contractPermission">
+                  <Can
+                    action={"projects:create:contractPermission"}
+                    unitId={handleOrganizationalUnitIDsArray(
+                      data.organizationalUnits
+                    )}
+                  >
                     <Button
                       icon={<FaPlus />}
                       onClick={() => {
@@ -641,6 +691,9 @@ export default function SpecificProject() {
                   <>
                     {data.contractPermissions.map((contract) => (
                       <ContractPermissionCard
+                        organizationalUnits={handleOrganizationalUnitIDsArray(
+                          data.organizationalUnits
+                        )}
                         key={contract._id}
                         contract={contract}
                         onUpdate={(contract) => {
@@ -665,7 +718,12 @@ export default function SpecificProject() {
             <>
               <CardBody>
                 <div className="mb-4">
-                  <Can action="projects:create:contractPermission">
+                  <Can
+                    action="projects:create:withdrawalPermission"
+                    unitId={handleOrganizationalUnitIDsArray(
+                      data.organizationalUnits
+                    )}
+                  >
                     <Button
                       icon={<FaPlus />}
                       onClick={() => {
@@ -681,6 +739,9 @@ export default function SpecificProject() {
                   <>
                     {data.withdrawalPermissions.map((withdrawal) => (
                       <WithdrawalPermissionCard
+                        organizationalUnit={handleOrganizationalUnitIDsArray(
+                          data?.organizationalUnit
+                        )}
                         key={withdrawal._id}
                         withdrawal={withdrawal}
                         onUpdate={(withdrawal) => {
@@ -705,7 +766,12 @@ export default function SpecificProject() {
             <>
               <CardBody>
                 <div className="mb-4">
-                  <Can action="projects:create:financialAllocation">
+                  <Can
+                    action="projects:create:financialAllocation"
+                    unitId={handleOrganizationalUnitIDsArray(
+                      data.organizationalUnits
+                    )}
+                  >
                     <Button
                       icon={<FaPlus />}
                       onClick={() => {
@@ -721,6 +787,9 @@ export default function SpecificProject() {
                   <>
                     {data.financialAllocations.map((financialAllocation) => (
                       <FinancialAllocationCard
+                        organizationalUnit={handleOrganizationalUnitIDsArray(
+                          data?.organizationalUnit
+                        )}
                         key={financialAllocation._id}
                         financialAllocation={financialAllocation}
                         onUpdate={(financialAllocation) => {
@@ -745,7 +814,12 @@ export default function SpecificProject() {
             <>
               <CardBody>
                 <div className="mb-4">
-                  <Can action="projects:create:financialAllocation">
+                  <Can
+                    action="projects:create:estimatedCost"
+                    unitId={handleOrganizationalUnitIDsArray(
+                      data.organizationalUnits
+                    )}
+                  >
                     <Button
                       icon={<FaPlus />}
                       onClick={() => {
@@ -761,6 +835,9 @@ export default function SpecificProject() {
                   <>
                     {data.estimatedCosts.map((estimatedCost) => (
                       <EstimatedCostCard
+                        organizationalUnit={handleOrganizationalUnitIDsArray(
+                          data?.organizationalUnit
+                        )}
                         key={estimatedCost._id}
                         estimatedCost={estimatedCost}
                         onUpdate={(estimatedCost) => {
@@ -784,6 +861,9 @@ export default function SpecificProject() {
         </Card>
       </div>
       <AddProtocolModal
+        organizationalUnit={handleOrganizationalUnitIDsArray(
+          data?.organizationalUnit
+        )}
         projectID={id}
         isOpen={showProtocolModal}
         onClose={() => {
