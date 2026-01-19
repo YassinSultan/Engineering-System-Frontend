@@ -5,6 +5,10 @@ export const getCompanies = async (filters) => {
     const res = await api.get("/companies", { params: filters });
     return res.data;
 };
+export const getCompaniesOptions = async (filters) => {
+    const res = await api.get("/companies/options", { params: filters });
+    return res;
+};
 export const getCompany = async (filters) => {
     const res = await api.get(`/companies/${filters.id}`, { params: filters });
     return res;

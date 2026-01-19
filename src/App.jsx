@@ -29,6 +29,8 @@ import Project from "./components/pages/Project/Project";
 import SpecificUser from "./components/pages/User/SpecificUser";
 import SpecificProject from "./components/pages/Project/SpecificProject";
 import ProjectForm from "./components/pages/Project/ProjectForm";
+import BillOfQuantitie from "./components/pages/BillOfQuantitie/BillOfQuantitie";
+import BillOfQuantitieForm from "./components/pages/BillOfQuantitie/BillOfQuantitieForm";
 
 const router = createBrowserRouter([
   {
@@ -149,6 +151,24 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requirePermissions={["projects:read"]}>
             <SpecificProject />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "bill-of-quantitie",
+        element: (
+          <ProtectedRoute requirePermissions={["bill-of-quantitie:read"]}>
+            <BillOfQuantitie />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "bill-of-quantitie/create",
+        element: (
+          <ProtectedRoute
+            requirePermissions={["bill-of-quantitie:create:bill-of-quantitie"]}
+          >
+            <BillOfQuantitieForm mode="create" />
           </ProtectedRoute>
         ),
       },

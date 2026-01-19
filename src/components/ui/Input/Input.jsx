@@ -11,7 +11,7 @@ const Input = forwardRef(
       rules = {},
       ...props
     },
-    ref
+    ref,
   ) => {
     const inputId = id || "floating_" + label;
     const isRequired = !!rules.required;
@@ -72,7 +72,7 @@ const Input = forwardRef(
               ref={ref}
               type={type}
               id={inputId}
-              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm text-heading bg-transparent rounded-lg border 
+              className={`block px-2.5 pb-2.5 pt-4 w-full text-sm text-heading bg-transparent rounded-lg border disabled:cursor-not-allowed disabled:opacity-10
             appearance-none focus:outline-none focus:ring-0 peer
             ${
               error
@@ -103,7 +103,7 @@ const Input = forwardRef(
         </div>
       </>
     );
-  }
+  },
 );
 
 export default Input;

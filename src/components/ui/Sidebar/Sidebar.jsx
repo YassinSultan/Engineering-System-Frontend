@@ -1,12 +1,13 @@
 import React from "react";
 import { BiBuilding, BiHome, BiLogOut, BiPackage } from "react-icons/bi";
-import { FaProjectDiagram } from "react-icons/fa";
+import { FaProjectDiagram, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import Button from "../Button/Button";
 import { logout } from "../../../features/auth/authSlice";
 
 import SidebarNode from "./SidebarNode";
+import { FaFileInvoiceDollar } from "react-icons/fa6";
 
 const menu = [
   {
@@ -49,8 +50,29 @@ const menu = [
     ],
   },
   {
+    label: "المقايسات",
+    icon: <FaFileInvoiceDollar className="size-5" />,
+    path: "/bill-of-quantitie",
+    children: [
+      {
+        label: "إضافة مقايسة",
+        path: "/bill-of-quantitie/create",
+        permissions: ["bill-of-quantitie:create:bill-of-quantitie"],
+      },
+      {
+        label: "قائمة المقايسات",
+        path: "/bill-of-quantitie",
+        permissions: [
+          "bill-of-quantitie:read",
+          "bill-of-quantitie:update",
+          "bill-of-quantitie:delete",
+        ],
+      },
+    ],
+  },
+  {
     label: "إدارة المستخدمين",
-    icon: <BiPackage className="size-5" />,
+    icon: <FaUser className="size-5" />,
     path: "/users",
     children: [
       {

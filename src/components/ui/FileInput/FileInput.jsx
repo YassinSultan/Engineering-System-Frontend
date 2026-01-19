@@ -3,7 +3,7 @@ import React, { forwardRef, useState } from "react";
 const FileInput = forwardRef(
   (
     { label = "بيانات", id = "fileInput", onChange, multiple, ...props },
-    ref
+    ref,
   ) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -45,7 +45,7 @@ const FileInput = forwardRef(
         <div className="flex flex-col items-center justify-center w-full h-fit bg-neutral-secondary-medium border border-dashed rounded-lg">
           <div className="flex flex-col items-center justify-center p-3">
             <svg
-              className="w-8 h-8 mb-4"
+              className="w-8 h-8 mb-1"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -59,8 +59,8 @@ const FileInput = forwardRef(
                 d="M12 5v9m-5 0H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2M8 9l4-5 4 5m1 8h.01"
               />
             </svg>
-            <p className="mb-2 text-sm">اضغط لتحميل الملف</p>
-            <p className="text-xs mb-4">
+            <p className="mb-1 text-sm">اضغط لتحميل الملف</p>
+            <p className="text-xs mb-1">
               اقصى حجم الملف: <span className="font-semibold">30MB</span>
             </p>
 
@@ -113,7 +113,7 @@ const FileInput = forwardRef(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default FileInput;

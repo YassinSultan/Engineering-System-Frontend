@@ -20,7 +20,6 @@ import { useAuth } from "../../../hooks/useAuth";
 
 export default function ProjectForm({ mode = "create" }) {
   const { user } = useAuth();
-  console.log(user);
   const { id } = useParams();
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
   const isUpdate = mode === "update";
@@ -67,7 +66,7 @@ export default function ProjectForm({ mode = "create" }) {
     onSuccess: (res) => {
       console.log("res", res);
       toast.success(
-        mode === "create" ? "تم إنشاء المشروع بنجاح" : "تم تحديث المشروع بنجاح"
+        mode === "create" ? "تم إنشاء المشروع بنجاح" : "تم تحديث المشروع بنجاح",
       );
     },
     onError: (err) => {
@@ -75,7 +74,7 @@ export default function ProjectForm({ mode = "create" }) {
       toast.error(
         mode === "create"
           ? "حدث خطأ في انشاء المشروع"
-          : "حدث خطأ في تحديث المشروع"
+          : "حدث خطأ في تحديث المشروع",
       );
     },
   });
@@ -151,11 +150,11 @@ export default function ProjectForm({ mode = "create" }) {
   const canSelectUnit = user.permissions.some(
     (p) =>
       p.action === "projects:create:project" &&
-      (p.scope === "ALL" || p.scope === "CUSTOM_UNIT")
+      (p.scope === "ALL" || p.scope === "CUSTOM_UNIT"),
   );
 
   const fixedUnit = user.permissions.some(
-    (p) => p.action === "projects:create:project" && p.scope === "OWN_UNIT"
+    (p) => p.action === "projects:create:project" && p.scope === "OWN_UNIT",
   )
     ? user.organizationalUnit
     : null;
@@ -171,8 +170,8 @@ export default function ProjectForm({ mode = "create" }) {
             data.contractingParty === "CIVILIAN"
               ? "جهة مدنية"
               : data.contractingParty === "MILITARY"
-              ? "جهة عسكرية"
-              : "جهة موازنة",
+                ? "جهة عسكرية"
+                : "جهة موازنة",
         },
         status: {
           value: data.status,
@@ -180,8 +179,8 @@ export default function ProjectForm({ mode = "create" }) {
             data.status === "STUDY"
               ? "دراسة"
               : data.status === "ONGOING"
-              ? "جاري"
-              : "منتهي",
+                ? "جاري"
+                : "منتهي",
         },
         ownerEntity: data.ownerEntity
           ? {
