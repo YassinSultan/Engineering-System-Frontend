@@ -52,20 +52,20 @@ const menu = [
   {
     label: "المقايسات",
     icon: <FaFileInvoiceDollar className="size-5" />,
-    path: "/bill-of-quantitie",
+    path: "/billOfQuantitie",
     children: [
       {
         label: "إضافة مقايسة",
-        path: "/bill-of-quantitie/create",
-        permissions: ["bill-of-quantitie:create:bill-of-quantitie"],
+        path: "/bill-of-quantitie//create",
+        permissions: ["billOfQuantitie:create"],
       },
       {
         label: "قائمة المقايسات",
         path: "/bill-of-quantitie",
         permissions: [
-          "bill-of-quantitie:read",
-          "bill-of-quantitie:update",
-          "bill-of-quantitie:delete",
+          "billOfQuantitie:read",
+          "billOfQuantitie:update",
+          "billOfQuantitie:delete",
         ],
       },
     ],

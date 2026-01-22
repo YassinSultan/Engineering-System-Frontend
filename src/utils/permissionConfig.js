@@ -113,4 +113,34 @@ export const permissionGroups = [
             { name: "read", label: "عرض المشروع" },
         ],
     },
+    {
+        id: "billOfQuantitie",
+        label: "إدارة المقايسات",
+        prefix: "billOfQuantitie:",
+        permissions: [
+            {
+                name: "create",
+                label: "إضافة",
+                description: "مرحلة تسجيل المقايسة",
+            },
+            {
+                name: "step",
+                label: "مرحلة",
+                subPermissions: [
+                    { name: "REVIEW", label: "1", description: "مرحلة مراجعة المقايسة" },
+                    { name: "TECHNICAL", label: "2", description: "قائد المكتب الفني او قائد الكتيبة" },
+                    { name: "GENERAL", label: "3", description: "مكتب اللواء" }
+                ]
+            },
+            {
+                name: "update",
+                label: "تعديل",
+            },
+            {
+                name: "delete",
+                label: "حذف",
+            },
+            { name: "read", label: "عرض" },
+        ],
+    },
 ];

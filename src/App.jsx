@@ -31,6 +31,7 @@ import SpecificProject from "./components/pages/Project/SpecificProject";
 import ProjectForm from "./components/pages/Project/ProjectForm";
 import BillOfQuantitie from "./components/pages/BillOfQuantitie/BillOfQuantitie";
 import BillOfQuantitieForm from "./components/pages/BillOfQuantitie/BillOfQuantitieForm";
+import SpecificBillOfQuantitie from "./components/pages/BillOfQuantitie/SpecificBillOfQuantitie";
 
 const router = createBrowserRouter([
   {
@@ -157,17 +158,33 @@ const router = createBrowserRouter([
       {
         path: "bill-of-quantitie",
         element: (
-          <ProtectedRoute requirePermissions={["bill-of-quantitie:read"]}>
+          <ProtectedRoute requirePermissions={["billOfQuantitie:read"]}>
             <BillOfQuantitie />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "bill-of-quantitie/:id",
+        element: (
+          <ProtectedRoute requirePermissions={["billOfQuantitie:read"]}>
+            <SpecificBillOfQuantitie />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "bill-of-quantitie/updute",
+        element: (
+          <ProtectedRoute
+            requirePermissions={["bill-of-quantitie:update:bill-of-quantitie"]}
+          >
+            <BillOfQuantitieForm mode="update" />
           </ProtectedRoute>
         ),
       },
       {
         path: "bill-of-quantitie/create",
         element: (
-          <ProtectedRoute
-            requirePermissions={["bill-of-quantitie:create:bill-of-quantitie"]}
-          >
+          <ProtectedRoute requirePermissions={["billOfQuantitie:create"]}>
             <BillOfQuantitieForm mode="create" />
           </ProtectedRoute>
         ),

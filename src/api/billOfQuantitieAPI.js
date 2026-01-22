@@ -22,3 +22,9 @@ export const updateBillOfQuantitie = async ({ id, data }) => {
     });
     return res.data;
 };
+export const updateStepOfBillOfQuantitie = async ({ id, stepName, formData }) => {
+    const res = await api.patch(`/bill-of-quantitie/${id}/${stepName}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+};

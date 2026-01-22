@@ -141,15 +141,18 @@ export default function BillOfQuantitie() {
       enableFilter: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
-          <Can action="projects:read" unitId={row.original.organizationalUnit}>
-            <NavLink to={`/projects/read/${row.original._id}`}>
+          <Can
+            action="billOfQuantitie:read"
+            unitId={row.original.organizationalUnit}
+          >
+            <NavLink to={`/bill-of-quantitie/${row.original._id}`}>
               <button className="p-2 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                 <BsEye className="w-4 h-4" />
               </button>
             </NavLink>
           </Can>
           <Can
-            action="projects:update:project"
+            action="billOfQuantitie:update:billOfQuantitie"
             unitId={row.original.organizationalUnit}
           >
             <NavLink to={`/projects/update/${row.original._id}`}>
@@ -181,7 +184,7 @@ export default function BillOfQuantitie() {
               {excelMutation.isPending ? "جاري التصدير..." : "تصدير إكسل"}
             </Button>
           </Can> */}
-          <Can action="billOfQuantitie:create:billOfQuantitie">
+          <Can action="billOfQuantitie:create">
             <Button
               onClick={() => navigate("/bill-of-quantitie/create")}
               icon={<FaPlus />}

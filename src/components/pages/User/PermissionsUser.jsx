@@ -64,8 +64,8 @@ export default function PermissionsUser() {
       const base = group.prefix;
       const hasWrite = ["create", "update", "delete"].some((act) =>
         actions.some(
-          (a) => a === `${base}${act}` || a.startsWith(`${base}${act}:`)
-        )
+          (a) => a === `${base}${act}` || a.startsWith(`${base}${act}:`),
+        ),
       );
       if (hasWrite) {
         const readAction = `${base}read`;
@@ -170,6 +170,7 @@ export default function PermissionsUser() {
                     }}
                   >
                     <h3 className="text-xl font-semibold">{group.label}</h3>
+                    <p className="text-xl font-semibold">{group.description}</p>
                     <IoIosArrowDown
                       size={20}
                       className={`${
@@ -194,13 +195,13 @@ export default function PermissionsUser() {
                         const actionBase = `${group.prefix}${perm.name}`;
                         const subActions = perm.subPermissions
                           ? perm.subPermissions.map(
-                              (sp) => `${actionBase}:${sp.name}`
+                              (sp) => `${actionBase}:${sp.name}`,
                             )
                           : [actionBase];
 
                         // نعتبر الصلاحية الرئيسية مفعلة لو أي sub مفعلة
                         const isEnabled = subActions.some((act) =>
-                          permissions.some((p) => p.action === act)
+                          permissions.some((p) => p.action === act),
                         );
 
                         return (
@@ -214,6 +215,9 @@ export default function PermissionsUser() {
                           >
                             <div className="font-medium text-lg mb-4">
                               {perm.label}
+                              {perm.description && (
+                                <p className="opacity-60">{perm.description}</p>
+                              )}
                             </div>
 
                             {perm.subPermissions ? (
@@ -232,14 +236,21 @@ export default function PermissionsUser() {
                                           onChange={(e) =>
                                             upsertPermission(
                                               subAction,
-                                              e.target.checked ? "ALL" : null
+                                              e.target.checked ? "ALL" : null,
                                             )
                                           }
                                           className="w-5 h-5 text-blue-600 rounded"
                                         />
-                                        <span>
-                                          {perm.label} {sub.label}
-                                        </span>
+                                        <div>
+                                          <span>
+                                            {perm.label} {sub.label}
+                                          </span>
+                                          {sub.description && (
+                                            <p className="opacity-60">
+                                              {sub.description}
+                                            </p>
+                                          )}
+                                        </div>
                                       </label>
 
                                       {scope && (
@@ -253,7 +264,7 @@ export default function PermissionsUser() {
                                                 onChange={() =>
                                                   upsertPermission(
                                                     subAction,
-                                                    "ALL"
+                                                    "ALL",
                                                   )
                                                 }
                                               />
@@ -268,7 +279,7 @@ export default function PermissionsUser() {
                                                 onChange={() =>
                                                   upsertPermission(
                                                     subAction,
-                                                    "OWN_UNIT"
+                                                    "OWN_UNIT",
                                                   )
                                                 }
                                               />
@@ -286,7 +297,7 @@ export default function PermissionsUser() {
                                                   upsertPermission(
                                                     subAction,
                                                     "CUSTOM_UNITS",
-                                                    getCurrentUnits(subAction)
+                                                    getCurrentUnits(subAction),
                                                   )
                                                 }
                                               />
@@ -298,7 +309,7 @@ export default function PermissionsUser() {
                                             <div className="flex items-center gap-3">
                                               <span className="text-sm text-gray-600">
                                                 {getUnitNames(
-                                                  getCurrentUnits(subAction)
+                                                  getCurrentUnits(subAction),
                                                 )}
                                               </span>
                                               <button
@@ -328,7 +339,7 @@ export default function PermissionsUser() {
                                     onChange={(e) =>
                                       upsertPermission(
                                         actionBase,
-                                        e.target.checked ? "ALL" : null
+                                        e.target.checked ? "ALL" : null,
                                       )
                                     }
                                     className="w-5 h-5 text-blue-600 rounded"
@@ -364,7 +375,7 @@ export default function PermissionsUser() {
                                           onChange={() =>
                                             upsertPermission(
                                               actionBase,
-                                              "OWN_UNIT"
+                                              "OWN_UNIT",
                                             )
                                           }
                                         />
@@ -382,7 +393,7 @@ export default function PermissionsUser() {
                                             upsertPermission(
                                               actionBase,
                                               "CUSTOM_UNITS",
-                                              getCurrentUnits(actionBase)
+                                              getCurrentUnits(actionBase),
                                             )
                                           }
                                         />
@@ -395,7 +406,7 @@ export default function PermissionsUser() {
                                       <div className="flex items-center gap-3">
                                         <span className="text-sm text-gray-600">
                                           {getUnitNames(
-                                            getCurrentUnits(actionBase)
+                                            getCurrentUnits(actionBase),
                                           )}
                                         </span>
                                         <button
