@@ -203,14 +203,14 @@ export default function DataTable({
                       className={cn(
                         "px-4 py-3.5 font-semibold text-center whitespace-nowrap transition-colors",
                         "bg-primary-500 text-primary-content-500",
-                        canSort && "cursor-pointer hover:bg-primary-600"
+                        canSort && "cursor-pointer hover:bg-primary-600",
                       )}
                       onClick={() => canSort && handleSort(header.column.id)}
                     >
                       <div className="flex items-center justify-center gap-2 relative">
                         {flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
 
                         {canSort && getSortIcon(header.column.id)}
@@ -223,7 +223,7 @@ export default function DataTable({
                               "p-1.5 rounded transition-colors relative",
                               header.column.getFilterValue()
                                 ? "text-primary bg-primary/30 border border-primary/50"
-                                : "text-muted-foreground hover:text-foreground hover:bg-accent/70"
+                                : "text-muted-foreground hover:text-foreground hover:bg-accent/70",
                             )}
                             title="تصفية العمود"
                           >
@@ -313,7 +313,7 @@ export default function DataTable({
                     "hover:bg-primary-200 hover:text-primary-content-200 transition-colors",
                     index % 2 === 0
                       ? "bg-primary-50 text-primary-content-50 dark:bg-primary-800 dark:text-primary-content-800"
-                      : "bg-primary-100 text-primary-content-100 dark:bg-primary-900 dark:text-primary-content-900"
+                      : "bg-primary-100 text-primary-content-100 dark:bg-primary-900 dark:text-primary-content-900",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -323,7 +323,7 @@ export default function DataTable({
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </td>
                   ))}
@@ -352,6 +352,7 @@ export default function DataTable({
           <div className="flex items-center gap-4">
             <div className="w-35">
               <AppSelect
+                isClearable={false}
                 isSearchable={false}
                 size="sm"
                 label=""
