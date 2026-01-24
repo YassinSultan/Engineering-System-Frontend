@@ -32,6 +32,7 @@ export default function Button({
   };
 
   const sizes = {
+    icon: "p-2",
     sm: "px-3 py-1.5 text-sm",
     md: "px-4 py-2.5 text-sm",
     lg: "px-5 py-3 text-base",
@@ -48,7 +49,7 @@ export default function Button({
         sizes[size],
         fullWidth && "w-full",
         disabledStyles,
-        className
+        className,
       )}
       disabled={disabled}
       {...props}

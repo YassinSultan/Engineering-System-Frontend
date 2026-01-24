@@ -18,6 +18,7 @@ export default function AppSelect({
   loadOptionsFn = null,
   createOptionsFn = null,
   isSearchable = true,
+  isClearable = true,
   size = "md",
 }) {
   const [isFocused, setIsFocused] = useState(false);
@@ -75,8 +76,8 @@ export default function AppSelect({
       borderColor: isInvalid
         ? "#dc2626"
         : isFocused
-        ? "var(--color-primary-500)"
-        : "var(--color-foreground)",
+          ? "var(--color-primary-500)"
+          : "var(--color-foreground)",
       borderRadius: "8px",
       minHeight: size === "sm" ? "32px" : "48px",
       boxShadow: "none",
@@ -123,17 +124,18 @@ export default function AppSelect({
       backgroundColor: state.isSelected
         ? "var(--color-primary-500)"
         : state.isFocused
-        ? "var(--color-primary-50)"
-        : "transparent",
+          ? "var(--color-primary-50)"
+          : "transparent",
       color: state.isSelected
         ? "var(--color-primary-content-500)"
         : state.isFocused
-        ? "var(--color-primary-content-50)"
-        : "",
+          ? "var(--color-primary-content-50)"
+          : "",
     }),
   };
 
   const commonProps = {
+    isClearable,
     isSearchable,
     value,
     onChange,

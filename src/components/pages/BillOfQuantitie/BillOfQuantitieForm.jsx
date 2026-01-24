@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import PageTitle from "../../ui/PageTitle/PageTitle";
 import { getProjectsOptions } from "../../../api/projectApi";
 import AppSelect from "../../ui/AppSelect/AppSelect";
@@ -18,6 +18,8 @@ import { useParams } from "react-router";
 import Loading from "../../common/Loading/Loading";
 import OrganizationalTreeModal from "../../common/OrganizationalTreeModal/OrganizationalTreeModal";
 import Button from "../../ui/Button/Button";
+import { FaPlus } from "react-icons/fa";
+import { BiSolidTrash } from "react-icons/bi";
 
 const allDisciplines = [
   { value: "GENERAL", label: "اعتيادي" },
@@ -32,7 +34,6 @@ const allDisciplines = [
 ];
 
 export default function BillOfQuantitieForm({ mode = "create" }) {
-  console.log("mode", mode);
   const { user } = useAuth();
   const { id } = useParams();
   const [isUnitModalOpen, setIsUnitModalOpen] = useState(false);
@@ -61,11 +62,7 @@ export default function BillOfQuantitieForm({ mode = "create" }) {
       steelPrice: "",
       cementPrice: "",
       completionPercentage: "",
-      disciplines: allDisciplines.map((d) => ({
-        type: d.value,
-        selected: false,
-        amount: "",
-      })),
+      disciplines: [],
       boqExcel: null,
       boqPdf: null,
       priceAnalysisPdf: null,
@@ -79,8 +76,10 @@ export default function BillOfQuantitieForm({ mode = "create" }) {
     control,
     name: "organizationalUnit",
   });
-  // مراقبة التخصصات لمعرفة أيها مختار
-  const disciplines = useWatch({ control, name: "disciplines" }) || [];
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "disciplines",
+  });
   const mutation = useMutation({
     mutationFn:
       mode === "create" ? createBillOfQuantitie : updateBillOfQuantitie,
@@ -128,8 +127,12 @@ export default function BillOfQuantitieForm({ mode = "create" }) {
 
       // التخصصات – فقط المختارة
       const selectedDisciplines = data.disciplines
-        .filter((d) => d.selected)
-        .map((d) => ({ type: d.type, amount: d.amount }));
+        .filter((d) => d.type && d.amount)
+        .map((d) => ({
+          type: d.type.value,
+          amount: Number(d.amount),
+        }));
+
       formData.append("disciplines", JSON.stringify(selectedDisciplines));
 
       const fileFields = [
@@ -178,14 +181,20 @@ export default function BillOfQuantitieForm({ mode = "create" }) {
         p.action === "BillOfQuantitie:create:BillOfQuantitie" &&
         (p.scope === "ALL" || p.scope === "CUSTOM_UNIT"),
     ) || user.role === "SUPER_ADMIN";
-
+  useEffect(() => {
+    if (!canSelectUnit) {
+      setValue("organizationalUnit", user.organizationalUnit, {
+        shouldValidate: true,
+      });
+    }
+  }, [canSelectUnit, user, setValue]);
   if (isLoading) return <Loading />;
   return (
     <>
       <section>
         <div className="mb-4">
           <PageTitle
-            title={isUpdate ? "إضافة مقايسة جديد" : "تعديل المقايسة"}
+            title={isUpdate ? "تعديل المقايسة" : "إضافة مقايسة جديد"}
           />
         </div>
 
@@ -297,63 +306,88 @@ export default function BillOfQuantitieForm({ mode = "create" }) {
               </label>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allDisciplines.map((disc, index) => {
-                  const isSelected = disciplines[index]?.selected || false;
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="flex items-center justify-between gap-4 border p-4 rounded-md bg-gray-50"
+                  >
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Discipline Type */}
+                      <Controller
+                        name={`disciplines.${index}.type`}
+                        control={control}
+                        rules={{ required: "نوع التخصص مطلوب" }}
+                        render={({ field: controllerField, fieldState }) => {
+                          // Get all currently selected types (except the current row)
+                          const selectedTypes = fields
+                            .filter((f, i) => i !== index) // exclude current row
+                            .map((f) => f.type?.value) // get value string
+                            .filter(Boolean); // remove undefined/null
 
-                  return (
-                    <div
-                      key={disc.value}
-                      className={`p-4 border rounded-lg transition-all duration-200 flex justify-between items-center ${
-                        isSelected
-                          ? "border-blue-500  shadow-sm"
-                          : "border-gray-200 "
-                      }`}
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`disc-${disc.value}`}
-                          checked={isSelected}
-                          onChange={(e) => {
-                            setValue(
-                              `disciplines.${index}.selected`,
-                              e.target.checked,
-                            );
-                            // إذا ألغى التحديد → امسح المبلغ
-                            if (!e.target.checked) {
-                              setValue(`disciplines.${index}.amount`, "");
-                            }
-                          }}
-                          className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                        />
-                        <label
-                          htmlFor={`disc-${disc.value}`}
-                          className="mr-3  font-medium cursor-pointer select-none"
-                        >
-                          {disc.label}
-                        </label>
-                      </div>
+                          // Filter available options
+                          const availableOptions = allDisciplines.filter(
+                            (opt) => !selectedTypes.includes(opt.value),
+                          );
 
-                      <div>
-                        <Input
-                          disabled={!isSelected}
-                          type="number"
-                          label="المبلغ"
-                          placeholder="0.00"
-                          {...register(`disciplines.${index}.amount`, {
-                            required: isSelected
-                              ? "المبلغ مطلوب لهذا التخصص"
-                              : false,
-                            min: { value: 0, message: "المبلغ ≥ 0" },
-                            valueAsNumber: true,
-                          })}
-                          error={errors.disciplines?.[index]?.amount}
-                        />
-                      </div>
+                          return (
+                            <AppSelect
+                              options={availableOptions}
+                              isCreatable={false}
+                              label="نوع التخصص"
+                              value={controllerField.value}
+                              onChange={controllerField.onChange}
+                              isInvalid={!!fieldState.error}
+                              error={fieldState.error?.message}
+                              // Optional: placeholder when no options left
+                              placeholder={
+                                availableOptions.length === 0
+                                  ? "تم اختيار جميع التخصصات"
+                                  : "اختر التخصص"
+                              }
+                            />
+                          );
+                        }}
+                      />
+
+                      {/* Amount */}
+                      <Input
+                        type="number"
+                        label="التكلفة"
+                        {...register(`disciplines.${index}.amount`, {
+                          required: "التكلفة مطلوبة",
+                          min: {
+                            value: 0,
+                            message: "القيمة يجب أن تكون موجبة",
+                          },
+                        })}
+                        error={errors.disciplines?.[index]?.amount}
+                      />
                     </div>
-                  );
-                })}
+
+                    <Button
+                      type="button"
+                      onClick={() => remove(index)}
+                      variant="danger"
+                      size="icon"
+                    >
+                      <BiSolidTrash />
+                    </Button>
+                  </div>
+                ))}
               </div>
+              <Button
+                type="button"
+                onClick={() =>
+                  append({
+                    type: null,
+                    amount: "",
+                  })
+                }
+                className="mt-4"
+                icon={<FaPlus />}
+              >
+                اضافة تخصص
+              </Button>
             </div>
 
             {/* ──────────────── قسم المرفقات (Attachments) ──────────────── */}
