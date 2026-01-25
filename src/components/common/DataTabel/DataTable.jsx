@@ -9,13 +9,6 @@ import {
 import { cn } from "../../../lib/utils";
 import { BsArrowDown, BsArrowUp } from "react-icons/bs";
 import {
-  BiChevronLeft,
-  BiChevronRight,
-  BiChevronsLeft,
-  BiChevronsRight,
-} from "react-icons/bi";
-import {
-  FaA,
   FaAngleLeft,
   FaAngleRight,
   FaArrowsUpDown,
