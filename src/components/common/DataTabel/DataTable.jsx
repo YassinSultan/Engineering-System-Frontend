@@ -14,7 +14,14 @@ import {
   BiChevronsLeft,
   BiChevronsRight,
 } from "react-icons/bi";
-import { FaArrowsUpDown, FaFilter, FaX } from "react-icons/fa6";
+import {
+  FaA,
+  FaAngleLeft,
+  FaAngleRight,
+  FaArrowsUpDown,
+  FaFilter,
+  FaX,
+} from "react-icons/fa6";
 import AppSelect from "../../ui/AppSelect/AppSelect";
 import ColumnFilter from "../ColumnFilter/ColumnFilter";
 import {
@@ -24,6 +31,7 @@ import {
   shift,
   autoUpdate,
 } from "@floating-ui/react";
+import { ThreeDot } from "react-loading-indicators";
 
 export default function DataTable({
   data = [],
@@ -143,7 +151,7 @@ export default function DataTable({
     table.setColumnFilters((old) => old.filter((f) => f.id !== columnId));
   };
   return (
-    <div className="table-container bg-card">
+    <div className="table-container">
       {/* Active Filters Display */}
       {activeFilters?.length > 0 && (
         <div className="bg-muted/40 px-4 py-3 mb-4 bg-base roun-lg">
@@ -183,9 +191,9 @@ export default function DataTable({
           </div>
         </div>
       )}
-      <div className="w-full max-h-[70vh] overflow-auto rounded-lg">
+      <div className="w-full max-h-[70vh] overflow-auto">
         <table className="w-full min-w-max text-sm text-nowrap">
-          <thead className="sticky top-0 z-30 bg-table-header text-table-header-foreground">
+          <thead className="sticky top-0 z-30">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -201,9 +209,9 @@ export default function DataTable({
                     <th
                       key={`${header.column.id}-${header.depth}`}
                       className={cn(
-                        "px-4 py-3.5 font-semibold text-center whitespace-nowrap transition-colors",
-                        "bg-primary-500 text-primary-content-500",
-                        canSort && "cursor-pointer hover:bg-primary-600",
+                        "px-4 py-3.5 text-center whitespace-nowrap transition-colors font-bold",
+                        "text-primary-500 dark:text-foreground border first:border-s-0 last:border-l-0 border-gray-200",
+                        canSort && "cursor-pointer",
                       )}
                       onClick={() => canSort && handleSort(header.column.id)}
                     >
@@ -222,7 +230,7 @@ export default function DataTable({
                             className={cn(
                               "p-1.5 rounded transition-colors relative",
                               header.column.getFilterValue()
-                                ? "text-primary bg-primary/30 border border-primary/50"
+                                ? "text-foreground bg-primary/30 border border-primary/50"
                                 : "text-muted-foreground hover:text-foreground hover:bg-accent/70",
                             )}
                             title="تصفية العمود"
@@ -268,16 +276,17 @@ export default function DataTable({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-table-border">
+          <tbody>
             {loading ? (
               <tr>
                 <td colSpan={columns.length} className="text-center py-16">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
-                    <span className="text-muted-foreground">
-                      جاري التحميل...
-                    </span>
-                  </div>
+                  <ThreeDot
+                    variant="brick-stack"
+                    color="var(--color-primary-600)"
+                    size="small"
+                    text="جاري التحميل ..."
+                    textColor="var(--color-primary-600)"
+                  />
                 </td>
               </tr>
             ) : data.length === 0 ? (
@@ -311,15 +320,13 @@ export default function DataTable({
                   key={row.id}
                   className={cn(
                     "hover:bg-primary-200 hover:text-primary-content-200 transition-colors",
-                    index % 2 === 0
-                      ? "bg-primary-50 text-primary-content-50 dark:bg-primary-800 dark:text-primary-content-800"
-                      : "bg-primary-100 text-primary-content-100 dark:bg-primary-900 dark:text-primary-content-900",
+                    index % 2 === 0 ? "" : "bg-primary-50",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={`${row.id}-${cell.id}`}
-                      className="px-4 py-3 text-center border-x last:border-l-0 first:border-s-0 "
+                      className="px-4 py-3 text-center border last:border-l-0 first:border-s-0 border-gray-200"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -336,7 +343,7 @@ export default function DataTable({
 
       {/* Pagination */}
       {totalRecords > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-muted/30 border-t border-table-border">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-muted/30">
           <div className="text-sm text-muted-foreground">
             عرض{" "}
             <span className="font-semibold text-foreground">{startRecord}</span>{" "}
@@ -373,43 +380,41 @@ export default function DataTable({
                 }}
               />
             </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => onPageChange(0)}
-                disabled={pageIndex === 0}
-                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
-                title="الصفحة الأولى"
-              >
-                <BiChevronsRight className="w-4 h-4" />
-              </button>
+            <div className="flex items-center flex-row-reverse gap-2">
               <button
                 onClick={() => onPageChange(pageIndex - 1)}
                 disabled={pageIndex === 0}
-                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
-                title="الصفحة السابقة"
+                className="w-8 h-8 rounded border disabled:opacity-20 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500"
               >
-                <BiChevronRight className="w-4 h-4" />
+                <FaAngleLeft />
               </button>
 
-              <span className="px-3 py-1.5 text-sm font-medium">
-                {pageIndex + 1} / {pageCount}
-              </span>
+              {getPaginationPages(pageIndex + 1, pageCount).map((p, idx) =>
+                p === "..." ? (
+                  <span key={idx} className="px-2 py-1">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={idx}
+                    onClick={() => onPageChange(Number(p) - 1)}
+                    className={`w-8 h-8 flex items-center justify-center rounded border border-gray-200 cursor-pointer ${
+                      pageIndex + 1 === p
+                        ? "bg-primary-500 text-primary-content-500"
+                        : "dark:bg-gray-800 dark:text-white bg-gray-200 text-black "
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ),
+              )}
 
               <button
                 onClick={() => onPageChange(pageIndex + 1)}
                 disabled={pageIndex >= pageCount - 1}
-                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
-                title="الصفحة التالية"
+                className="w-8 h-8 rounded border disabled:opacity-20 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500"
               >
-                <BiChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => onPageChange(pageCount - 1)}
-                disabled={pageIndex >= pageCount - 1}
-                className="p-1.5 cursor-pointer rounded-md border border-input bg-background disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-500 hover:text-primary-content-500 transition-colors"
-                title="الصفحة الأخيرة"
-              >
-                <BiChevronsLeft className="w-4 h-4" />
+                <FaAngleRight />
               </button>
             </div>
           </div>
@@ -417,4 +422,34 @@ export default function DataTable({
       )}
     </div>
   );
+}
+function getPaginationPages(currentPage, totalPages, maxVisible = 3) {
+  const pages = [];
+
+  if (totalPages <= maxVisible) {
+    // لو الصفحات أقل من الحد الأقصى، اعرض الكل
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    const half = Math.floor(maxVisible / 2);
+    let start = Math.max(1, currentPage - half);
+    let end = Math.min(totalPages, currentPage + half);
+
+    if (currentPage <= half) {
+      start = 1;
+      end = maxVisible;
+    } else if (currentPage + half >= totalPages) {
+      start = totalPages - maxVisible + 1;
+      end = totalPages;
+    }
+
+    for (let i = start; i <= end; i++) pages.push(i);
+
+    if (start > 2) pages.unshift("...");
+    if (start > 1) pages.unshift(1);
+
+    if (end < totalPages - 1) pages.push("...");
+    if (end < totalPages) pages.push(totalPages);
+  }
+
+  return pages;
 }
