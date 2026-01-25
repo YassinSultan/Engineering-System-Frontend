@@ -14,7 +14,7 @@ export default function Button({
   ...props
 }) {
   const baseStyles =
-    "inline-flex items-center justify-center rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center rounded-md font-medium focus:outline-none transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-offset-0";
 
   const variants = {
     primary:
@@ -34,8 +34,8 @@ export default function Button({
   const sizes = {
     icon: "p-2",
     sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2.5 text-sm",
-    lg: "px-5 py-3 text-base",
+    md: "px-4 py-2 text-sm",
+    lg: "px-8 py-2 text-sm",
   };
 
   const disabledStyles = disabled ? "opacity-50 cursor-not-allowed" : "";
