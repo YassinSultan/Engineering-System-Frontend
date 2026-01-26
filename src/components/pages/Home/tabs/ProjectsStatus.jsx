@@ -5,9 +5,9 @@ export default function ProjectsStatus() {
   return (
     <>
       <section>
-        <h1 className="text-xl font-bold text-primary-500 dark:text-white">
-          موقف المشاريع
-        </h1>
+        <div className="flex justify-between items-center p-4">
+          <h2 className="text-xl text-primary-500">موقف المشاريع</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-4">
           <div className="group bg-base shadow rounded-md overflow-hidden">
             <div className="bg-gray-200 dark:text-black rounded-bl-full group-hover:bg-primary-600 group-hover:text-primary-content-600">

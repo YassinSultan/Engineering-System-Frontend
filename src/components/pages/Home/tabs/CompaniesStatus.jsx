@@ -68,6 +68,8 @@ export default function CompaniesStatus() {
     {
       id: "status",
       header: "كود الموافقة الامنية",
+      enableSorting: false,
+      enableFilter: false,
       accessorKey: "status",
       cell: ({ row }) => (
         <span
@@ -106,6 +108,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "contractingParty",
+      enableSorting: false,
+      enableFilter: false,
       header: "عدد المشروعات المسندة",
       accessorKey: "contractingParty",
       cell: ({ row }) => (
@@ -146,6 +150,8 @@ export default function CompaniesStatus() {
     {
       id: "code",
       header: "جملة الاعمال المسندة",
+      enableSorting: false,
+      enableFilter: false,
       accessorKey: "code",
       cell: ({ row }) => (
         <span className="text-xs px-2 py-1">{row.original.code}</span>
@@ -158,6 +164,8 @@ export default function CompaniesStatus() {
     {
       id: "startDate",
       header: "عدد العقود",
+      enableSorting: false,
+      enableFilter: false,
       accessorKey: "startDate",
       meta: {
         filterType: "date",
@@ -170,6 +178,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "location",
+      enableSorting: false,
+      enableFilter: false,
       header: "قيمة العقود",
       accessorKey: "location",
       cell: ({ row }) => (
@@ -182,6 +192,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "عدد المقايسات",
       accessorKey: "landArea",
       cell: ({ row }) => (
@@ -194,6 +206,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "قيمة المقايسات",
       accessorKey: "landArea",
       cell: ({ row }) => (
@@ -206,6 +220,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "اجمالي المستحق",
       accessorKey: "landArea",
       cell: ({ row }) => (
@@ -218,6 +234,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "اجمالي المنصرف خامات",
       accessorKey: "landArea",
       cell: ({ row }) => (
@@ -230,6 +248,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "اجمالي المنصرف مستخلصات",
       accessorKey: "landArea",
       cell: ({ row }) => (
@@ -242,6 +262,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "اجمالي صافي المنصرف",
       accessorKey: "landArea",
       cell: ({ row }) => (
@@ -254,6 +276,8 @@ export default function CompaniesStatus() {
     },
     {
       id: "landArea",
+      enableSorting: false,
+      enableFilter: false,
       header: "اجمالي المتبقي",
       accessorKey: "landArea",
       cell: ({ row }) => (

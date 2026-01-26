@@ -81,7 +81,7 @@ export default function Home() {
               </div>
             }
           >
-            <div className="rounded-xl bg-base shadow">
+            <div className="rounded-xl bg-base shadow p-8">
               {ActiveTabComponent ? (
                 <ActiveTabComponent />
               ) : (

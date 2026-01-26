@@ -185,8 +185,8 @@ export default function DataTable({
         </div>
       )}
       <div className="w-full max-h-[70vh] overflow-auto">
-        <table className="w-full min-w-max text-sm text-nowrap">
-          <thead className="sticky top-0 z-30">
+        <table className="w-full text-sm">
+          <thead className="sticky -top-1 z-30 bg-background">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -202,7 +202,7 @@ export default function DataTable({
                     <th
                       key={`${header.column.id}-${header.depth}`}
                       className={cn(
-                        "px-4 py-3.5 text-center whitespace-nowrap transition-colors font-bold",
+                        "px-2 py-6 text-center transition-colors font-bold",
                         "text-primary-500 dark:text-foreground border first:border-s-0 last:border-l-0 border-gray-200",
                         canSort && "cursor-pointer",
                       )}
@@ -312,14 +312,14 @@ export default function DataTable({
                 <tr
                   key={row.id}
                   className={cn(
-                    "hover:bg-primary-200 hover:text-primary-content-200 transition-colors",
+                    "hover:bg-primary-50/50 hover:text-primary-content-200 transition-colors",
                     index % 2 === 0 ? "" : "bg-primary-50",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={`${row.id}-${cell.id}`}
-                      className="px-4 py-3 text-center border last:border-l-0 first:border-s-0 border-gray-200"
+                      className="px-4 py-4 text-center text-nowrap border last:border-l-0 first:border-s-0 border-gray-200"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
